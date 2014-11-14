@@ -32,7 +32,7 @@ complete <- function(directory, id = 1:332) {
     
     ## open file data
     data <- read.csv(fp)
-    ## remove any NA values in out specified column
+    ## remove any NA values in entire data set
     data.clean <- data[complete.cases(data[ , ]), ]
     ## set the number of complete rows in the vals DF
     vals[idx, 2] <- nrow(data.clean)
