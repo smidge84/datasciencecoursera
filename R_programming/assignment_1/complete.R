@@ -15,6 +15,7 @@ complete <- function(directory, id = 1:332) {
   
   vals <- data.frame(id, integer(length(id)))
   colnames(vals) <- c("id", "nobs") ## set column names
+  idx <- 1 ## loop counter for indexing into data frame
   
   
   for (i in id){
@@ -34,7 +35,9 @@ complete <- function(directory, id = 1:332) {
     ## remove any NA values in out specified column
     data.clean <- data[complete.cases(data[ , ]), ]
     ## set the number of complete rows in the vals DF
-    vals[1, 2] <- nrow(data.clean)
+    vals[idx, 2] <- nrow(data.clean)
+    ## incriment the loop counter
+    idx <- idx + 1
     
   }
   
