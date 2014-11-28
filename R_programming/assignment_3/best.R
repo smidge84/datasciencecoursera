@@ -6,7 +6,7 @@
 ## The function will return the hospital name of the top value
 best <- function(state, outcome) {
   ## Read outcome data
-  raw <- read.csv("outcome-of-care-measures.csv", colClasses = "character")
+  raw <- read.csv("./outcome-of-care-measures.csv", colClasses = "character")
   
   ## Check that state and outcome are valid
   ## By splitting the data by state, then check to see if a matching state exists
