@@ -10,7 +10,7 @@ best <- function(state, outcome) {
   
   ## Check that state and outcome are valid
   ## By splitting the data by state, then check to see if a matching state exists
-  data.by.state <- split(raw, raw.State)
+  data.by.state <- split(raw, raw$State)
   snames <- names(data.by.state)
   bool <- lapply(snames, function(st) st == state)
   ## converting bool from a list of lists of booleans, to a boolean
@@ -41,7 +41,9 @@ best <- function(state, outcome) {
   }
   
   ## selecting only the data of the required state
-  data.of.state <- data.by.state$state
+  data.of.state <- data.by.state[[state]]
+  ## converting required column data to numerics from characters
+  data.of.state[, col] <- as.numeric(data.of.state[, col])
   ## using complete.cases to remove entries with NA or NAN values
   data.clean <- data.of.state[complete.cases(data.of.state[ , col]), ]
   ## sorting the data first by 'col', then by 'Hospital Name'
