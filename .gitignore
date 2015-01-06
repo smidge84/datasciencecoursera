@@ -1,3 +1,5 @@
 *.Rhistory
 *.Rhistory
 *.Rhistory
+./Getting_&_Cleaning_Data/course_project/project_description.txt
+"./Getting_&_Cleaning_Data/course_project/UCI HAR Dataset/*"
