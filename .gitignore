@@ -3,3 +3,41 @@
 *.Rhistory
 ./Getting_&_Cleaning_Data/course_project/project_description.txt
 "./Getting_&_Cleaning_Data/course_project/UCI HAR Dataset/*"
+Getting_&_Cleaning_Data/course_project/project_description.txt
+Getting_&_Cleaning_Data/course_project/UCI HAR Dataset/activity_labels.txt
+Getting_&_Cleaning_Data/course_project/UCI HAR Dataset/features.txt
+Getting_&_Cleaning_Data/course_project/UCI HAR Dataset/features_info.txt
+Getting_&_Cleaning_Data/course_project/UCI HAR Dataset/README.txt
+Getting_&_Cleaning_Data/course_project/UCI HAR Dataset/test/Inertial Signals/body_acc_x_test.txt
+Getting_&_Cleaning_Data/course_project/UCI HAR Dataset/test/Inertial Signals/body_acc_y_test.txt
+Getting_&_Cleaning_Data/course_project/UCI HAR Dataset/test/Inertial Signals/body_acc_z_test.txt
+Getting_&_Cleaning_Data/course_project/UCI HAR Dataset/test/Inertial Signals/body_gyro_x_test.txt
+Getting_&_Cleaning_Data/course_project/UCI HAR Dataset/test/Inertial Signals/body_gyro_y_test.txt
+Getting_&_Cleaning_Data/course_project/UCI HAR Dataset/test/Inertial Signals/body_gyro_z_test.txt
+Getting_&_Cleaning_Data/course_project/UCI HAR Dataset/test/Inertial Signals/total_acc_x_test.txt
+Getting_&_Cleaning_Data/course_project/UCI HAR Dataset/test/Inertial Signals/total_acc_y_test.txt
+Getting_&_Cleaning_Data/course_project/UCI HAR Dataset/test/Inertial Signals/total_acc_z_test.txt
+Getting_&_Cleaning_Data/course_project/UCI HAR Dataset/test/subject_test.txt
+Getting_&_Cleaning_Data/course_project/UCI HAR Dataset/test/X_test.txt
+Getting_&_Cleaning_Data/course_project/UCI HAR Dataset/test/y_test.txt
+Getting_&_Cleaning_Data/course_project/UCI HAR Dataset/train/Inertial Signals/body_acc_x_train.txt
+Getting_&_Cleaning_Data/course_project/UCI HAR Dataset/train/Inertial Signals/body_acc_y_train.txt
+Getting_&_Cleaning_Data/course_project/UCI HAR Dataset/train/Inertial Signals/body_acc_z_train.txt
+Getting_&_Cleaning_Data/course_project/UCI HAR Dataset/train/Inertial Signals/body_gyro_x_train.txt
+Getting_&_Cleaning_Data/course_project/UCI HAR Dataset/train/Inertial Signals/body_gyro_y_train.txt
+Getting_&_Cleaning_Data/course_project/UCI HAR Dataset/train/Inertial Signals/body_gyro_z_train.txt
+Getting_&_Cleaning_Data/course_project/UCI HAR Dataset/train/Inertial Signals/total_acc_x_train.txt
+Getting_&_Cleaning_Data/course_project/UCI HAR Dataset/train/Inertial Signals/total_acc_y_train.txt
+Getting_&_Cleaning_Data/course_project/UCI HAR Dataset/train/Inertial Signals/total_acc_z_train.txt
+Getting_&_Cleaning_Data/course_project/UCI HAR Dataset/train/subject_train.txt
+Getting_&_Cleaning_Data/course_project/UCI HAR Dataset/train/X_train.txt
+Getting_&_Cleaning_Data/course_project/UCI HAR Dataset/train/y_train.txt
+Getting_&_Cleaning_Data/getdata-projectfiles-UCI HAR Dataset.zip
+R_programming/assignment_1/.Rhistory
+R_programming/assignment_1/.Rhistory
+R_programming/assignment_1/.Rhistory
+R_programming/assignment_3/.RData
+R_programming/assignment_3/outcome-of-care-measures - Copy.csv
+R_programming/assignment_3/submitscript3.R
+R_programming/assignment_3/.RData
+R_programming/assignment_1/.Rhistory
