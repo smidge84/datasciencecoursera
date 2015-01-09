@@ -13,7 +13,7 @@ mergeDataSets <- function(){
   
   
   ## loading data from training set
-  X_train <- read.table(paste(baseDataPath, "train/X_traun.txt", sep=""), header=FALSE, dec=".", colClasses="numeric")
+  X_train <- read.table(paste(baseDataPath, "train/X_train.txt", sep=""), header=FALSE, dec=".", colClasses="numeric")
   y_train <- read.table(paste(baseDataPath, "train/y_train.txt", sep=""), header=FALSE, colClasses="numeric")
   subject_train <- read.table(paste(baseDataPath, "train/subject_train.txt", sep=""), header=FALSE, colClasses="numeric")
   

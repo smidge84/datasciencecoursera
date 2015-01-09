@@ -41,3 +41,6 @@ R_programming/assignment_3/outcome-of-care-measures - Copy.csv
 R_programming/assignment_3/submitscript3.R
 R_programming/assignment_3/.RData
 R_programming/assignment_1/.Rhistory
+.Rproj.user
+*.RData
+*.Rproj
