@@ -15,4 +15,33 @@ a)	Firstly, before merging the test & training data sets, we need to create a si
 	When importing X data, note that the values have decimal points, but there were only correctly imported when specified as a comma
 	use the argument dec="," when loading data <- this was causing an error and resulted in values loaded as factors not numerics
 	
+##	Before being able to manipulate the data using the dplyr package tools, we need to change the data form a data frame to a data frame table
+	Do this by using the function tbl_df(<data.frame>)
+	
+>>	Selecting the columns we're interested in -- SUBSETTING
+	We can do this by using the select function and assigning it to a new variable
+	foo <- select(<data.table>, <list of column names...>)
+	
+	if you negate ('-') a column it will be removed when using select()
+
+>>	Selecting the rows we're interested in -- FILTERING
+	filter(<data.table>, <boolean exp of column = value pairs>)
+	
+	
+>>  Summarising a data table allows us to perform calculations such as mean() or standard deviation on specified columns
+	This returns a data table where we can specify the column heading during out call to summarize.
+	summarize(<data table>, <list of operations on columns>)
+	eg. summarize(cran, avg_bytes = mean(size))
+	
+>>  Grouping the data into categories allows us to perform operations not on the data as a whole, but separated out by the category specified
+
+2)	Selecting the mean and standard deviation for each measurement
+	By looking at the 'features' file, it can be seen that the mean and standard deviation has already been provided for each measurement taken by the phone.
+	Therefore all we need to do is select the columns which contain either 'mean' or 'std' in their name.
+	Manually examining the text file it can be seen that there are 56 'mean' columns and 33 'std' columns, totalling 89 columns
+	
+	Here we are basically sub-setting out the data, so we'll be using the 'select' function in the 'dplyr' package
+	To do this look into the use of Regular expressions to search through 'features' for patterns that contain either 'mean' or 'std'
+	
+	grepl(<pattern>, <string>)
 	
