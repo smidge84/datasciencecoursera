@@ -1,0 +1,18 @@
+:: G&C_D assignment plan ::
+
+1)	Merging the training and test data sets.
+a)	Firstly, before merging the test & training data sets, we need to create a single data set for test and training data
+	We can approach this by center the structure around the data in X_<test/train>.txt as this is the biggest data structure
+	i) 		features.txt contains the column labels for the samples in X_<test/train>.txt
+	11)		subject_<test/train>.txt contains the row identity of the participant who performed the activity.
+			The column name for this could be "participant_id"
+	111)	y_<test/train>.txt contains the row labels identifying which activity was performed.
+			The column name for this could be "activity_id"
+	iv)		So, first create a new data table with 'X' data and heading from 'features'
+			Then add a column at the end with heading 'participant_id' and values from 'subject' data.
+			Then add another column at the end with heading 'activity_id' and values from 'y' data.
+			
+	When importing X data, note that the values have decimal points, but there were only correctly imported when specified as a comma
+	use the argument dec="," when loading data <- this was causing an error and resulted in values loaded as factors not numerics
+	
+	
