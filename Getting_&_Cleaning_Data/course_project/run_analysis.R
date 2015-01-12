@@ -40,7 +40,7 @@ mergeDataSets <- function(){
   all_test <- bind_cols(list(subject_test, y_test, X_test))
   
   ## merging both traing and test data sets to create a single data set
-  comp_data <- join_all(list(all_train, all_test))
+  comp_data <- rbindlist(list(all_train, all_test), use.names=TRUE)
   
   ## Making data set more readable by replacing numbers with descriptive text
   ## ... TODO
