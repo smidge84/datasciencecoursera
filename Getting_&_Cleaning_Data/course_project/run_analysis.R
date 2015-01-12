@@ -1,4 +1,5 @@
 ## Libraries required
+library(plyr) ## for the 'join_all' function
 library(dplyr)
 library(data.table)
 
@@ -20,10 +21,10 @@ mergeDataSets <- function(){
   ## Setting the column names training data tables
   names(X_train) <- features$V2
   names(y_train) <- "activity"
-  names(subject_train) <- "participant"
+  names(subject_train) <- "participant_id"
   
   ## merging the training data into a single data table
-  ## ... TODO
+  all_train <- bind_cols(list(subject_train, y_train, X_train))
   
   ## loading data from test set
   X_test <- read.table(paste(baseDataPath, "test/X_test.txt", sep=""), header=FALSE, dec=".", colClasses="numeric")
@@ -33,10 +34,13 @@ mergeDataSets <- function(){
   ## Setting the column names for the test data tables
   names(X_test) <- features$V2
   names(y_test) <- "activity"
-  names(subject_test) <- "participant"
+  names(subject_test) <- "participant_id"
   
   ## Merging the test data into a single data table
-  ## ... TODO
+  all_test <- bind_cols(list(subject_test, y_test, X_test))
+  
+  ## merging both traing and test data sets to create a single data set
+  comp_data <- join_all(list(all_train, all_test))
   
   ## Making data set more readable by replacing numbers with descriptive text
   ## ... TODO

@@ -45,3 +45,21 @@ a)	Firstly, before merging the test & training data sets, we need to create a si
 	
 	grepl(<pattern>, <string>)
 	
+	Reg Exp Syntax:
+	"." - the dot will match 'any' character
+	[] - square braces can be used to define the 'character class' of a character within the pattern
+	[Ii] - will match both upller and lower case 'i'
+	^ - indicates pattern should be at the start of the line
+	$ - indicates pattern should be at the end of the line
+	| - logical 'or' to specify alternative patterns 'flood|fire'
+	() - to specify sub-expressions
+	? - at he end of an expressions makes it optional
+	\ - backslash is used as an 'escape' character to literal match characters that otherwise have a special meaning in the expression, such as \.
+	\. - must escape 'period' because otherwise it represents 'any' character
+	* - any number of repetitions of a pattern, including none
+	+ - at least one repetition of a pattern
+	{} - curly braces are used to specify the number of repetitions of a expression/sub-expressions
+	    eg {1,5} - 1 to 5 repetitions
+		eg {4} - exactly 4 repetitions
+		eg {3,} - at least 3 repetitions
+	
