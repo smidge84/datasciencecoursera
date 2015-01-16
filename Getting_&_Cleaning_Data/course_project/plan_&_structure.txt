@@ -63,3 +63,10 @@ a)	Firstly, before merging the test & training data sets, we need to create a si
 		eg {4} - exactly 4 repetitions
 		eg {3,} - at least 3 repetitions
 	
+>> 	Step 5 in project
+-- 	creates a second, independent tidy data set with the average of each variable for each activity and each subject.
+	This is asking us to consider the data, firstly by participant, then by activity and calculate the mean of each variable.
+	
+	Thinking about using chaining and group_by() on data.table
+	Maybe firstly make a copy of the original tidy data table
+	result <- DT %>% group_by(participant_id, activityName) %>% summarize(mean)

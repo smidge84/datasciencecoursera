@@ -1,14 +1,11 @@
 ## Libraries required
-#library(plyr) ## for the 'join_all' function
 library(dplyr)
 library(data.table)
 
 baseDataPath <- "./UCI HAR Dataset/"
 
 
-mergeDataSets <- function(){
-  #trainFiles <- c("train/X_train.txt", "train/subject_train.txt", "train/y_train.txt")
-  #testFiles <- c("test/X_test.txt", "test/subject_train.txt", test/y_test.txt"")
+#mergeDataSets <- function(){
   
   features <- read.table("./UCI HAR Dataset/features.txt", sep=" ", stringsAsFactors=FALSE)
   
@@ -48,13 +45,21 @@ mergeDataSets <- function(){
   ## Making data set more readable by replacing numbers with descriptive text
   ## Replace actividy id numbers with descriptive names
   act_tbl <- read.table(paste(baseDataPath, "activity_labels.txt", sep=""), header=FALSE, colClasses=list("numeric", "character"))
-  data2[, activityName := act_tbl[activity_id,2]]
+  data2[, activity_name := act_tbl[activity_id,2]]
   
   ## removing the activity_id column as it is no longer necessary
   data2 <- select(data2, -activity_id)
   
+  ## Re-ordering the data table columns into a more logical order
+  ## so that activity_name is after participant_id
+  numCols <- dim(data2)[2]
+  setcolorder(data2, c(1, numCols, 2:(numCols-1)))
+  
   ## separate data set on averages (mean) by variable, activity & subject
+  mean_data <- data2 %>% group_by(participant_id, activity_name) %>% summarise_each(funs(mean))
   
+  ## Writing out both original tidy data set and summary tidy data set of means
+  write.table(data2, file="./tidy_dataset_full.txt")
+  write.table(mean_data, file="./tidy_dataset_means.txt")
   
-  
-}
+#}
