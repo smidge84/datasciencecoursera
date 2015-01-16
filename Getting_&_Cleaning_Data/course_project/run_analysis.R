@@ -17,7 +17,7 @@ baseDataPath <- "./UCI HAR Dataset/"
   
   ## Setting the column names training data tables
   names(X_train) <- features$V2
-  names(y_train) <- "activity"
+  names(y_train) <- "activity_id"
   names(subject_train) <- "participant_id"
   
   ## merging the training data into a single data table
