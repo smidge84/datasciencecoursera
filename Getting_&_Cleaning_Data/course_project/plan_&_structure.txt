@@ -15,7 +15,7 @@ a)	Firstly, before merging the test & training data sets, we need to create a si
 	When importing X data, note that the values have decimal points, but there were only correctly imported when specified as a comma
 	use the argument dec="," when loading data <- this was causing an error and resulted in values loaded as factors not numerics
 	
-##	Before being able to manipulate the data using the dplyr package tools, we need to change the data form a data frame to a data frame table
+##	Before being able to manipulate the data using the dplyr package tools, we need to change the data from a data frame to a data frame table
 	Do this by using the function tbl_df(<data.frame>)
 	
 >>	Selecting the columns we're interested in -- SUBSETTING

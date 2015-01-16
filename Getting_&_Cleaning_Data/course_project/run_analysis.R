@@ -1,5 +1,5 @@
 ## Libraries required
-library(plyr) ## for the 'join_all' function
+#library(plyr) ## for the 'join_all' function
 library(dplyr)
 library(data.table)
 
@@ -33,7 +33,7 @@ mergeDataSets <- function(){
   
   ## Setting the column names for the test data tables
   names(X_test) <- features$V2
-  names(y_test) <- "activity"
+  names(y_test) <- "activity_id"
   names(subject_test) <- "participant_id"
   
   ## Merging the test data into a single data table
@@ -42,7 +42,19 @@ mergeDataSets <- function(){
   ## merging both traing and test data sets to create a single data set
   comp_data <- rbindlist(list(all_train, all_test), use.names=TRUE)
   
+  ## Select data only to do with the mean & standard deviation for each variable
+  data2 <- select(comp_tbl, participant_id, activity_id, contains("mean"), contains("std"))
+  
   ## Making data set more readable by replacing numbers with descriptive text
-  ## ... TODO
+  ## Replace actividy id numbers with descriptive names
+  act_tbl <- read.table(paste(baseDataPath, "activity_labels.txt", sep=""), header=FALSE, colClasses=list("numeric", "character"))
+  data2[, activityName := act_tbl[activity_id,2]]
+  
+  ## removing the activity_id column as it is no longer necessary
+  data2 <- select(data2, -activity_id)
+  
+  ## separate data set on averages (mean) by variable, activity & subject
+  
+  
   
 }
