@@ -71,9 +71,9 @@ baseDataPath <- "./UCI HAR Dataset/"
   wd <- getwd()
 
   cat("## Full Data set:", file1, "\n", sep=" ")
-  write.table(data2, file=file1)
+  write.table(data2, file=file1, row.name=FALSE)
   cat("## Summary Data Set:", file2, "\n", sep=" ")
-  write.table(mean_data, file=file2)
+  write.table(mean_data, file=file2, row.name=FALSE)
 
   cat("\n## END OF DATA ANALYSIS ##\n")
   

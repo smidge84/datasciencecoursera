@@ -70,3 +70,26 @@ a)	Firstly, before merging the test & training data sets, we need to create a si
 	Thinking about using chaining and group_by() on data.table
 	Maybe firstly make a copy of the original tidy data table
 	result <- DT %>% group_by(participant_id, activityName) %>% summarize(mean)
+	
+	
+>>	Documentation
+
+	--- CODE BOOK ---
+	This document describes:
+	1) variables with units - Both complete and summary data sets
+	2) Transformations used to clean up the data
+	3) summaries performed on the data and what does this mean
+	
+	--- READ ME ---
+	To explain how the script works and any special requirements necessary.
+	1) The script should be in your working directory, with the original data sets in a subdirectory called "UCI HAR Dataset"
+	2) required packages (dplyr and data.table) to be installed before running the script
+	3) Local variable at the top of the script specifies the base path to the data set directory, relative to the working directory.
+	   If this is different from the above, please change the value of this variable.
+	4) Directory structure of required files.
+	5) Simply source the script into your R session and it will full execute. This is because all the code is explicitly stated in the script file and not
+	   contain within a function. This could be an improvement in the future so that the script only executes when desired. IT could also allow for argument passing
+	   to change from the default behaviour.
+	6) Print statements throughout the script just to indicate to the user what is happening and that the script hasn't frozen
+	   >> Maybe have these listed in order for reference <<
+	   
