@@ -92,4 +92,6 @@ a)	Firstly, before merging the test & training data sets, we need to create a si
 	   to change from the default behaviour.
 	6) Print statements throughout the script just to indicate to the user what is happening and that the script hasn't frozen
 	   >> Maybe have these listed in order for reference <<
+	7) command to read in the data sets exported to txt files.
+	
 	   

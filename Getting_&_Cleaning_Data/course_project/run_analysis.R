@@ -7,7 +7,7 @@ baseDataPath <- "./UCI HAR Dataset/"
 
 #mergeDataSets <- function(){
   
-  features <- read.table("./UCI HAR Dataset/features.txt", sep=" ", stringsAsFactors=FALSE)
+  features <- read.table(paste(baseDataPath, "features.txt", sep=""), sep=" ", stringsAsFactors=FALSE)
   
   
   ## loading data from training set
