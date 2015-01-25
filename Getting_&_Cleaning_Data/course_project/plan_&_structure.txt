@@ -1,0 +1,97 @@
+:: G&C_D assignment plan ::
+
+1)	Merging the training and test data sets.
+a)	Firstly, before merging the test & training data sets, we need to create a single data set for test and training data
+	We can approach this by center the structure around the data in X_<test/train>.txt as this is the biggest data structure
+	i) 		features.txt contains the column labels for the samples in X_<test/train>.txt
+	11)		subject_<test/train>.txt contains the row identity of the participant who performed the activity.
+			The column name for this could be "participant_id"
+	111)	y_<test/train>.txt contains the row labels identifying which activity was performed.
+			The column name for this could be "activity_id"
+	iv)		So, first create a new data table with 'X' data and heading from 'features'
+			Then add a column at the end with heading 'participant_id' and values from 'subject' data.
+			Then add another column at the end with heading 'activity_id' and values from 'y' data.
+			
+	When importing X data, note that the values have decimal points, but there were only correctly imported when specified as a comma
+	use the argument dec="," when loading data <- this was causing an error and resulted in values loaded as factors not numerics
+	
+##	Before being able to manipulate the data using the dplyr package tools, we need to change the data from a data frame to a data frame table
+	Do this by using the function tbl_df(<data.frame>)
+	
+>>	Selecting the columns we're interested in -- SUBSETTING
+	We can do this by using the select function and assigning it to a new variable
+	foo <- select(<data.table>, <list of column names...>)
+	
+	if you negate ('-') a column it will be removed when using select()
+
+>>	Selecting the rows we're interested in -- FILTERING
+	filter(<data.table>, <boolean exp of column = value pairs>)
+	
+	
+>>  Summarising a data table allows us to perform calculations such as mean() or standard deviation on specified columns
+	This returns a data table where we can specify the column heading during out call to summarize.
+	summarize(<data table>, <list of operations on columns>)
+	eg. summarize(cran, avg_bytes = mean(size))
+	
+>>  Grouping the data into categories allows us to perform operations not on the data as a whole, but separated out by the category specified
+
+2)	Selecting the mean and standard deviation for each measurement
+	By looking at the 'features' file, it can be seen that the mean and standard deviation has already been provided for each measurement taken by the phone.
+	Therefore all we need to do is select the columns which contain either 'mean' or 'std' in their name.
+	Manually examining the text file it can be seen that there are 56 'mean' columns and 33 'std' columns, totalling 89 columns
+	
+	Here we are basically sub-setting out the data, so we'll be using the 'select' function in the 'dplyr' package
+	To do this look into the use of Regular expressions to search through 'features' for patterns that contain either 'mean' or 'std'
+	
+	grepl(<pattern>, <string>)
+	
+	Reg Exp Syntax:
+	"." - the dot will match 'any' character
+	[] - square braces can be used to define the 'character class' of a character within the pattern
+	[Ii] - will match both upller and lower case 'i'
+	^ - indicates pattern should be at the start of the line
+	$ - indicates pattern should be at the end of the line
+	| - logical 'or' to specify alternative patterns 'flood|fire'
+	() - to specify sub-expressions
+	? - at he end of an expressions makes it optional
+	\ - backslash is used as an 'escape' character to literal match characters that otherwise have a special meaning in the expression, such as \.
+	\. - must escape 'period' because otherwise it represents 'any' character
+	* - any number of repetitions of a pattern, including none
+	+ - at least one repetition of a pattern
+	{} - curly braces are used to specify the number of repetitions of a expression/sub-expressions
+	    eg {1,5} - 1 to 5 repetitions
+		eg {4} - exactly 4 repetitions
+		eg {3,} - at least 3 repetitions
+	
+>> 	Step 5 in project
+-- 	creates a second, independent tidy data set with the average of each variable for each activity and each subject.
+	This is asking us to consider the data, firstly by participant, then by activity and calculate the mean of each variable.
+	
+	Thinking about using chaining and group_by() on data.table
+	Maybe firstly make a copy of the original tidy data table
+	result <- DT %>% group_by(participant_id, activityName) %>% summarize(mean)
+	
+	
+>>	Documentation
+
+	--- CODE BOOK ---
+	This document describes:
+	1) variables with units - Both complete and summary data sets
+	2) Transformations used to clean up the data
+	3) summaries performed on the data and what does this mean
+	
+	--- READ ME ---
+	To explain how the script works and any special requirements necessary.
+	1) The script should be in your working directory, with the original data sets in a subdirectory called "UCI HAR Dataset"
+	2) required packages (dplyr and data.table) to be installed before running the script
+	3) Local variable at the top of the script specifies the base path to the data set directory, relative to the working directory.
+	   If this is different from the above, please change the value of this variable.
+	4) Directory structure of required files.
+	5) Simply source the script into your R session and it will full execute. This is because all the code is explicitly stated in the script file and not
+	   contain within a function. This could be an improvement in the future so that the script only executes when desired. IT could also allow for argument passing
+	   to change from the default behaviour.
+	6) Print statements throughout the script just to indicate to the user what is happening and that the script hasn't frozen
+	   >> Maybe have these listed in order for reference <<
+	7) command to read in the data sets exported to txt files.
+	
+	   
