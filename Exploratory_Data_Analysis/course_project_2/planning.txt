@@ -31,14 +31,15 @@ ________________________________________________________________________________
 	Making a conditional plot (using facets in GGPLOT2 package)
 	facets by type -  1 row, 4 columns
 	DT[,.(V4.Sum = sum(V4)),by=.(V1,V2)]
-	for each type, line plot of total emmissions by year
+	for each type, bar plot of total emissions by year
 _______________________________________________________________________________________________________________________________________________________________________	
 >> Q4	
 	Across the United States, how have emissions from coal combustion-related sources changed from 1999–2008?
 
 	Here we need to update SSC variable with values from "Source_Classification_Code.rds"
 	DT[, V1 := round(exp(V1),2)] -> This is done by reference and doesn't reassignment
-	sub-set on coal combustions related sources
+	sub-set on coal combustions related sources:
+	This is when SCC Level One contains "combustion" & SCC Level Two contains "coal"
 	How many individual sources? - want a plot of total emissions for each source from 1999 to 2008
 	facets = source
 _______________________________________________________________________________________________________________________________________________________________________	
