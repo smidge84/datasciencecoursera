@@ -40,5 +40,5 @@ g <- g + scale_fill_brewer(palette="Spectral")
 
 g <- g + labs(title = "PM2.5 Fine Particle Emissions per Year by Emission Source\nBaltimore City") + labs(x = "Year") + labs(y = "Total Emissions (thousands of tons)")
       
-ggsave(file)
+ggsave(file, height=4, width=8, dpi=300)
 cat("\n## Plot created and output to file:", file, sep = " ")
