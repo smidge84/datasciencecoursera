@@ -1,0 +1,59 @@
+:::: Exp Data Analysis Project 2 Planning ::::
+
+>> Questions to Answer
+
+>> Initialisation
+	read in the data using readRDS()
+	check column classes (emissions & year) and convert strings to numerics where required
+
+>> Q1
+	Have total emissions from PM2.5 decreased in the United States from 1999 to 2008? Using the base plotting system, make a plot showing the total PM2.5 emission from all sources for each of the years 1999, 2002, 2005, and 2008.
+
+	sub-set the data for the required years (as specified) - using DATA.TABLE (or dplyr) -> DT[ V2 == "A"]
+	grouped_by(year), sum of emissions -> Doing j by group. DT[,.(V4.Sum = sum(V4)),by=V1]
+	plot(year, emissions, ...)
+	This could be a line graph with a single line <- NO
+	This should really be a bar plot as it shows totals (or count, frequency)
+	barplot(emissions, year, ...)
+	Annotate as appropriate
+_______________________________________________________________________________________________________________________________________________________________________	
+>> Q2
+	Have total emissions from PM2.5 decreased in the Baltimore City, Maryland (fips == "24510") from 1999 to 2008? Use the base plotting system to make a plot answering this question.
+
+	sub-set the data for Baltimore City only, then group by year and column sum(emissions) - using data.table (or dplyr) -> DT[ V2 == "A"]
+	-> Doing j by group. DT[,.(V4.Sum = sum(V4)),by=V1]
+	plot(year, sum(emissions), ty="l", ...)
+	Annotate as appropriate
+_______________________________________________________________________________________________________________________________________________________________________	
+>> Q3
+	Of the four types of sources indicated by the type (point, nonpoint, onroad, nonroad) variable, which of these four sources have seen decreases in emissions from 1999–2008 for Baltimore City? Which have seen increases in emissions from 1999–2008? Use the ggplot2 plotting system to make a plot answer this question.
+
+	Making a conditional plot (using facets in GGPLOT2 package)
+	facets by type -  1 row, 4 columns
+	DT[,.(V4.Sum = sum(V4)),by=.(V1,V2)]
+	for each type, bar plot of total emissions by year
+_______________________________________________________________________________________________________________________________________________________________________	
+>> Q4	
+	Across the United States, how have emissions from coal combustion-related sources changed from 1999–2008?
+
+	Here we need to update SSC variable with values from "Source_Classification_Code.rds"
+	DT[, V1 := round(exp(V1),2)] -> This is done by reference and doesn't reassignment
+	sub-set on coal combustions related sources:
+	This is when SCC Level One contains "combustion" & SCC Level Two contains "coal"
+	How many individual sources? - want a plot of total emissions for each source from 1999 to 2008
+	facets = source
+_______________________________________________________________________________________________________________________________________________________________________	
+>> Q5
+	How have emissions from motor vehicle sources changed from 1999–2008 in Baltimore City?
+
+	Similar to Q4 but sub-set of motor vehicle sources
+	plot of total emissions by year for each source
+	facets = source
+_______________________________________________________________________________________________________________________________________________________________________	
+>> Q6
+	Compare emissions from motor vehicle sources in Baltimore City with emissions from motor vehicle sources in Los Angeles County, California (fips == "06037"). Which city has seen greater changes over time in motor vehicle emissions?
+	
+	Taking data from Q5, sub-set again for Baltimore & LA only
+	Calculate sum(emissions) by city & year -> DT[,.(V4.Sum = sum(V4)),by=.(V1,V2)]
+	facets = (source,city) - 2 rows (city) by x columns (source) - see the complicated example in lecture slide for high multivariate plots???
+_______________________________________________________________________________________________________________________________________________________________________	
