@@ -6,6 +6,7 @@ library(data.table)
 library(dplyr)
 library(stringr)
 library(ggplot2)
+library(RColorBrewer) # To improve colour palettes in plots
 
 ## Reading in the data sets
 cat("\n## Reading in the data sets and converting to data.table object.")
@@ -44,6 +45,9 @@ file = "plot5.png"
 g <- ggplot(res, aes(year, Tot_Emi))
 
 g <- g + geom_bar(stat="identity", aes(fill=year), show_guide=FALSE)
+
+## Using R Color Brewer package to specify plot colours
+g <- g + scale_fill_brewer(palette="Dark2")
 
 g <- g + labs(title = "PM2.5 Fine Particle Emissions from Motor Vehicle Sources\nBaltimore City") +
   labs(x = "Year") +

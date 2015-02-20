@@ -6,6 +6,7 @@ library(data.table)
 library(dplyr)
 library(stringr)
 library(ggplot2)
+library(RColorBrewer)
 
 ## Reading in the data sets
 cat("\n## Reading in the data sets and converting to data.table object.")
@@ -50,6 +51,9 @@ file = "plot6.png"
 g <- ggplot(res2, aes(year, Tot_Emi))
 
 g <- g + geom_bar(stat="identity", aes(fill=location), position="dodge")
+
+## Setting plot colours using R Color Brewer palette
+g<- g + scale_fill_brewer(palette="Set1")
 
 g <- g + labs(title = "PM2.5 Fine Particle Emissions from Motor Vehicle Sources\nBaltimore City & Los Angeles County") +
   labs(x = "Year") +
