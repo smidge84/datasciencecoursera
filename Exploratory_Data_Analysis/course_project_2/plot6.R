@@ -59,6 +59,6 @@ g <- g + labs(title = "PM2.5 Fine Particle Emissions from Motor Vehicle Sources\
   labs(x = "Year") +
   labs(y = "Total Emissions (thousands of tons)")
 
-ggsave(file)
+ggsave(file, height=4, width=8, dpi=300)
 cat("\n## Plot created and output to file:", file, sep = " ")
 
