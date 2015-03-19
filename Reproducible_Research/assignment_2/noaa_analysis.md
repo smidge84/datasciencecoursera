@@ -1,0 +1,35 @@
+# United States Storm Analysis and Effect on Population and Economy
+Rich Robinson  
+
+# Synopsis
+This analysis is going to use storm data provided by NOAA from 1950 to November 2011 to assess the impact these storms have had on the health of the population and the consequences to the economy.
+
+# Data Processing
+
+## Downloading & Reading the Data
+The [NOAA Storm Database][1] tracks characteristics of major storms and weather events across the United States. It includes information on where and when they occur and estimates for fatalities, injuries and damage to properties. This data set containes information from 1950 to November 2011. At the start of the data set there are considerably records, however more recent entries are more complete.
+[1]: https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2 "NOAA Storm Database"  
+
+The data file is downloaded as part of this document (if not already available in the working directory), is named **"StormData.csv.bz2"** and is read into R by opening a bz file connection into the `read.csv` function. 
+
+
+```r
+zip_url <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2"
+bz_file <- "StormData.csv.bz2"
+
+## Checking to see if required files are present
+if (!file.exists(bz_file)){
+  download.file(zip_url, destfile = bz_file)
+}  
+if (!exists("noaa_data")){
+  noaa_data <- read.csv(bzfile(bz_file), header = TRUE, stringsAsFactors = FALSE)
+}
+```
+
+
+
+
+
+
+# Results
+

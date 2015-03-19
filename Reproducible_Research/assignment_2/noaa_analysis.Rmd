@@ -1,5 +1,5 @@
 ---
-title: "United States Storm Analysis and Effect on Population and Economy"
+title: "United States Storm Analysis and Effects on Population and Economy"
 author: "Rich Robinson"
 output:
   html_document:
@@ -9,23 +9,69 @@ output:
 # Synopsis
 This analysis is going to use storm data provided by NOAA from 1950 to November 2011 to assess the impact these storms have had on the health of the population and the consequences to the economy.
 
-# Loading & Pre-processing the Data
+# Data Processing
 
 ## Downloading & Reading the Data
 The [NOAA Storm Database][1] tracks characteristics of major storms and weather events across the United States. It includes information on where and when they occur and estimates for fatalities, injuries and damage to properties. This data set containes information from 1950 to November 2011. At the start of the data set there are considerably records, however more recent entries are more complete.
-[1]: https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2 "NOAA Storm Database"
 
-```{r init, echo=TRUE}
+[1]: https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2 "NOAA Storm Database"  
+
+The data file is downloaded as part of this document (if not already available in the working directory), is named **"StormData.csv.bz2"** and is read into R by opening a bz file connection into the `read.csv` function. 
+
+```{r init, echo=TRUE, warning=FALSE, message=FALSE}
 zip_url <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2"
-bz_file <- "StormData.bz2"
-#data_file <- "StormData.csv"
+bz_file <- "StormData.csv.bz2"
 
 ## Checking to see if required files are present
 if (!file.exists(bz_file)){
   download.file(zip_url, destfile = bz_file)
 }  
-if (!exists(noaa_data)){
+if (!exists("noaa_data")){
   noaa_data <- read.csv(bzfile(bz_file), header = TRUE, stringsAsFactors = FALSE)
 }
 ```
+
+## Analysing the Data Set
+
+The data set is large and requires quite a lot of time to read in. There are a total of `r dim(noaa_data)[1]` records and `r dim(noaa_data)[2]` variables.
+
+```{r dims}
+dim(noaa_data)
+```
+
+The heading for these variables are:
+```{r names}
+names(noaa_data)
+```
+The variables of particular interest include:
+* BGN_DATE
+* EVTYPE
+* FATALITIES
+* INJURIES
+* PROPDMG
+* CROPDMG
+
+# Event Serverity with respect to Public Health
+To assess which events are most harmful to public health let look at those events which have the highest number fatalities and injuries. First lets subset our data for the required fields and look into the different event types.
+
+```{r health, echo=TRUE, warning=FALSE, message=FALSE}
+library(dplyr)
+
+health_d <- noaa_data %>% select(EVTYPE, FATALITIES, INJURIES)
+
+n_evt <- length(unique(health_D$EVTYPE))
+n_evt
+
+head(unique(health_d$EVTYPE), n=9)
+
+```
+There are `r n_evt` different types of meteological events on record. The first 9 of them are lsted above. Upon quick analysis of this list, some of the event types appear to be summaries of events of specific events. Examples are shown below.
+```{r}
+## insert code here to extract examples of 'summary' event types
+## Look into working with strings & RegExp
+
+```
+
+
+# Results
 
