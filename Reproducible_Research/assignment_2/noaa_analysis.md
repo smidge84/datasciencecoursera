@@ -161,3 +161,43 @@ To assess the level of *harm* for each event type, the number of fatalities and 
 
 # Results
 
+Analysis of effect on public health could include a plot with facets by event type of stacked bar plots (to show total of harm and proportion fatalaties/health). Certainly this shoud be for only non-zero event types, of which there are 220. But 220 is a lot of plots, so maybe we should focus on a sub-set (10, 15, 20???). By using stacked bar plots we can discuss which events have the overal most harm, but also look into those which have the most fatalities or most injuries. 
+
+
+```r
+library(ggplot2)
+library(tidyr) ## required to reshape data from wide to long format
+
+res_health2 <- health_d2 %>% group_by(EVTYPE) %>% summarise(Fatalities = sum(FATALITIES), Injuries = sum(INJURIES))
+
+## selecting data to plot from the top 10 most 'harmful' event types as in res_health from earlier.
+top10 <- res_health2 %>% filter((Fatalities + Injuries) >= res_health$harm[10])
+top10
+```
+
+```
+## Source: local data frame [10 x 3]
+## 
+##               EVTYPE Fatalities Injuries
+## 1     EXCESSIVE HEAT       1903     6525
+## 2        FLASH FLOOD        978     1777
+## 3              FLOOD        470     6789
+## 4               HEAT        937     2100
+## 5          ICE STORM         89     1975
+## 6          LIGHTNING        816     5230
+## 7  THUNDERSTORM WIND        133     1488
+## 8            TORNADO       5633    91346
+## 9          TSTM WIND        504     6957
+## 10      WINTER STORM        206     1321
+```
+
+```r
+## This data is in a wide format. It would be better for plotting in a long format.
+top10_long <- gather(top10, "harm", "count", Fatalities:Injuries)
+g1 <- ggplot(top10_long, aes(x=EVTYPE, y=count, fill=harm)) + geom_bar(stat="identity")
+g1 <- g1 + theme(axis.text.x = element_text(angle=90, vjust=1))
+g1 <- g1 + labs(title = "Top 10 most Harmful Event Types") + xlab("Type of Event") + ylab("Total Number of Casulties") + theme(plot.title = element_text(face="bold"))
+g1
+```
+
+![](noaa_analysis_files/figure-html/res_health-1.png) 

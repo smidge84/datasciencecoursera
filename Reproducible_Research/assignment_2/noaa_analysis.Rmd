@@ -101,14 +101,18 @@ Analysis of effect on public health could include a plot with facets by event ty
 
 ```{r res_health, echo=TRUE}
 library(ggplot2)
+library(tidyr) ## required to reshape data from wide to long format
 
 res_health2 <- health_d2 %>% group_by(EVTYPE) %>% summarise(Fatalities = sum(FATALITIES), Injuries = sum(INJURIES))
 
 ## selecting data to plot from the top 10 most 'harmful' event types as in res_health from earlier.
 top10 <- res_health2 %>% filter((Fatalities + Injuries) >= res_health$harm[10])
+top10
 
 ## This data is in a wide format. It would be better for plotting in a long format.
-
-
-
+top10_long <- gather(top10, "harm", "count", Fatalities:Injuries)
+g1 <- ggplot(top10_long, aes(x=EVTYPE, y=count, fill=harm)) + geom_bar(stat="identity")
+g1 <- g1 + theme(axis.text.x = element_text(angle=90, vjust=1))
+g1 <- g1 + labs(title = "Top 10 most Harmful Event Types") + xlab("Type of Event") + ylab("Total Number of Casulties") + theme(plot.title = element_text(face="bold"))
+g1
 ```
