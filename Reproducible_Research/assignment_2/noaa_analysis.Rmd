@@ -18,7 +18,7 @@ The [NOAA Storm Database][1] tracks characteristics of major storms and weather 
 
 The data file is downloaded as part of this document (if not already available in the working directory), is named **"StormData.csv.bz2"** and is read into R by opening a bz file connection into the `read.csv` function. 
 
-```{r init, echo=TRUE, warning=FALSE, message=FALSE}
+```{r init, echo=TRUE, warning=FALSE, message=FALSE, cache.lazy=FALSE}
 zip_url <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2"
 bz_file <- "StormData.csv.bz2"
 
@@ -43,8 +43,8 @@ The heading for these variables are:
 ```{r names}
 names(noaa_data)
 ```
-The variables of particular interest include:
-* BGN_DATE
+The variables of particular interest include:  
+
 * EVTYPE
 * FATALITIES
 * INJURIES
@@ -52,26 +52,63 @@ The variables of particular interest include:
 * CROPDMG
 
 # Event Serverity with respect to Public Health
-To assess which events are most harmful to public health let look at those events which have the highest number fatalities and injuries. First lets subset our data for the required fields and look into the different event types.
+To assess which events are most harmful to public health lets look at those events which have the highest number fatalities and injuries. First lets subset our data for the required fields and look into the different event types.
 
 ```{r health, echo=TRUE, warning=FALSE, message=FALSE}
 library(dplyr)
 
 health_d <- noaa_data %>% select(EVTYPE, FATALITIES, INJURIES)
 
-n_evt <- length(unique(health_D$EVTYPE))
+n_evt <- length(unique(health_d$EVTYPE))
 n_evt
 
-head(unique(health_d$EVTYPE), n=9)
+head(unique(health_d$EVTYPE), n=10)
 
 ```
-There are `r n_evt` different types of meteological events on record. The first 9 of them are lsted above. Upon quick analysis of this list, some of the event types appear to be summaries of events of specific events. Examples are shown below.
-```{r}
-## insert code here to extract examples of 'summary' event types
-## Look into working with strings & RegExp
+There are `r n_evt` different types of meteological events on record. The first ten of them are lsted above. Upon quick analysis of this list, some of the event types appear to be summaries of events of specific events. Examples are shown below.
+```{r regExp}
+library(stringr)
+## extract examples of 'summary' event types
+
+reg_exp <- "^[Ss]ummary"
+sum_evts <- health_d %>% filter(str_detect(EVTYPE, reg_exp))
+num_sum_evts <- length(sum_evts$EVTYPE)
+uni_num_sum_evts <- length(unique(sum_evts$EVTYPE))
+head(sum_evts$EVTYPE, n=9)
+num_sum_evts
+uni_num_sum_evts
 
 ```
+The code chunk above shows the first nine *"summary"* records within our data set. There are a total of `r num_sum_evts` summary records, of which `r uni_num_sum_evts` are unique.  
+We will omit these records from our analysis as it is likely they will be a replication of data already in our subset under the specific meteological event's record. Duplication of values would skew our results.
+```{r health2, echo=TRUE}
+options(scipen=1)
+## we negate the outcome of 'str_detect' because we want records which are
+## not 'summary' records.
+health_d2 <- health_d %>% filter(!str_detect(EVTYPE, reg_exp))
+
+res_health <- health_d2 %>% group_by(EVTYPE) %>% summarise(harm = sum(FATALITIES)+sum(INJURIES))
+res_health <- res_health %>% arrange(desc(harm))
+head(res_health, n=10)
+```
+To assess the level of *harm* for each event type, the number of fatalities and injuries were added together. The above table shows the top 10 most harmful event types. The number one most harmful evet type is **`r res_health$EVTYPE[1]`** with a total of **`r res_health$harm[1]`** fatalities and injuries.  
+
 
 
 # Results
 
+Analysis of effect on public health could include a plot with facets by event type of stacked bar plots (to show total of harm and proportion fatalaties/health). Certainly this shoud be for only non-zero event types, of which there are 220. But 220 is a lot of plots, so maybe we should focus on a sub-set (10, 15, 20???). By using stacked bar plots we can discuss which events have the overal most harm, but also look into those which have the most fatalities or most injuries. 
+
+```{r res_health, echo=TRUE}
+library(ggplot2)
+
+res_health2 <- health_d2 %>% group_by(EVTYPE) %>% summarise(Fatalities = sum(FATALITIES), Injuries = sum(INJURIES))
+
+## selecting data to plot from the top 10 most 'harmful' event types as in res_health from earlier.
+top10 <- res_health2 %>% filter((Fatalities + Injuries) >= res_health$harm[10])
+
+## This data is in a wide format. It would be better for plotting in a long format.
+
+
+
+```
