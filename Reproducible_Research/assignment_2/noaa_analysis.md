@@ -58,13 +58,14 @@ names(noaa_data)
 ```
 The variables of particular interest include:  
 
+* BGN_DATE
 * EVTYPE
 * FATALITIES
 * INJURIES
 * PROPDMG
 * CROPDMG
 
-# Event Serverity with respect to Public Health
+## Event Severity with respect to Public Health
 To assess which events are most harmful to public health lets look at those events which have the highest number fatalities and injuries. First lets subset our data for the required fields and look into the different event types.
 
 
@@ -157,6 +158,132 @@ head(res_health, n=10)
 ```
 To assess the level of *harm* for each event type, the number of fatalities and injuries were added together. The above table shows the top 10 most harmful event types. The number one most harmful evet type is **TORNADO** with a total of **96979** fatalities and injuries.  
 
+## Economic Consequences of Severe Weather Events
+To investigate which severe weather events have greatest economic consequences, let us consider the values of damage done to property and to crops. As before, first lets subset our complete data set for the following variabes of intrest:
+
+* BGN_DATE
+* EVTYPE
+* PROPDMG
+* CROPDMG
+
+The date of the event can be of interest so we can look at changes in economic damage over time. Of all the date information available in the data set, we will only conside the date when the event started to categorise the time period the event belongs in. This will remove problems when an event persists across years.  
+To investigate this query, the data processing has been completed using the `data.table` package as it is very efficient and concise when coding.
+
+
+```r
+library(data.table)
+## creating a data.table version of the original data for efficient processing
+
+noaa_dt <- data.table(noaa_data)
+
+## Selecting only the required variables
+eco1_dt <- noaa_dt[, .(BGN_DATE, EVTYPE, PROPDMG, CROPDMG)]
+
+## Removing the 'summary' records as definer earlier
+#eco_dt <- eco1_dt[ EVTYPE == sum_evts$EVTYPE] #<- not working correctly
+eco_dt <- eco1_dt %>% filter(!str_detect(EVTYPE, reg_exp))
+```
+Again the *'summary'* event records were removed as their values will be duplicated in the associated event record.  
+In the original data set, the dates are `string` arrays. To copute them easier, it is better that they are variables of the `Date` class.
+
+```r
+## converting the date variable from a string to the Date class
+eco_dt[, BGN_DATE := as.Date(BGN_DATE, "%m/%d/%Y")]
+```
+
+```
+##           BGN_DATE     EVTYPE PROPDMG CROPDMG
+##      1: 1950-04-18    TORNADO    25.0       0
+##      2: 1950-04-18    TORNADO     2.5       0
+##      3: 1951-02-20    TORNADO    25.0       0
+##      4: 1951-06-08    TORNADO     2.5       0
+##      5: 1951-11-15    TORNADO     2.5       0
+##     ---                                      
+## 902221: 2011-11-30  HIGH WIND     0.0       0
+## 902222: 2011-11-10  HIGH WIND     0.0       0
+## 902223: 2011-11-08  HIGH WIND     0.0       0
+## 902224: 2011-11-09   BLIZZARD     0.0       0
+## 902225: 2011-11-28 HEAVY SNOW     0.0       0
+```
+
+```r
+## Grouping Dates into Decades for later comparison
+decs_seq <- seq(as.Date("01/01/1950", "%m/%d/%Y"), length.out=8, by="10 year")
+dec_labs <- c("1950s", "1960s", "1970s", "1980s", "1990s", "2000s", "2010s")
+eco_dt[, DECADE := cut(BGN_DATE, decs_seq, labels = dec_labs)]
+```
+
+```
+##           BGN_DATE     EVTYPE PROPDMG CROPDMG DECADE
+##      1: 1950-04-18    TORNADO    25.0       0  1950s
+##      2: 1950-04-18    TORNADO     2.5       0  1950s
+##      3: 1951-02-20    TORNADO    25.0       0  1950s
+##      4: 1951-06-08    TORNADO     2.5       0  1950s
+##      5: 1951-11-15    TORNADO     2.5       0  1950s
+##     ---                                             
+## 902221: 2011-11-30  HIGH WIND     0.0       0  2010s
+## 902222: 2011-11-10  HIGH WIND     0.0       0  2010s
+## 902223: 2011-11-08  HIGH WIND     0.0       0  2010s
+## 902224: 2011-11-09   BLIZZARD     0.0       0  2010s
+## 902225: 2011-11-28 HEAVY SNOW     0.0       0  2010s
+```
+
+```r
+d1 <- eco_dt[, BGN_DATE][1] ## First date
+dx <- eco_dt[, BGN_DATE][dim(eco_dt)[1]] ## Last date
+yrs <- length(seq(d1, dx, by="year")) ## Calculate number of years
+```
+The first record date is: 1950-04-18 and the last record date is: 2011-11-28 which spans a total of 62. Since this spans a long time period, it might be more convenient for a quick analysis to reduce the resolution by looking at the values across each decade. In order to achieve this the continuous dates values were converted into descrite decade values using a factor variable. The code chunck below shows the first six records and illustrates how a new factor variable `DECADE` has been created.
+
+```r
+head(eco_dt)
+```
+
+```
+##      BGN_DATE  EVTYPE PROPDMG CROPDMG DECADE
+## 1: 1950-04-18 TORNADO    25.0       0  1950s
+## 2: 1950-04-18 TORNADO     2.5       0  1950s
+## 3: 1951-02-20 TORNADO    25.0       0  1950s
+## 4: 1951-06-08 TORNADO     2.5       0  1950s
+## 5: 1951-11-15 TORNADO     2.5       0  1950s
+## 6: 1951-11-15 TORNADO     2.5       0  1950s
+```
+Two new data tables are created below. The first computes the total (economic) destruction for each event type for by decade. The total destruction is defined as the sum of property damage and crop damage *(combined destruction)*. The second data table is the total destruction, defined similarly, over the whole of the data set *(total destruction)*.
+
+```r
+## Computing the total destruction of each event type by decade
+dest_decs <- eco_dt[, .(COMB_DEST = sum(PROPDMG) + sum(CROPDMG)), by=.(EVTYPE, DECADE)][order(DECADE, -COMB_DEST)]
+## used data.table chaining to re-order the results for readability
+
+## Computing the total (economic) destruction for each event type over whole date range
+dest_all <- eco_dt[, .(TOTAL_DEST = sum(PROPDMG) + sum(CROPDMG)), by=EVTYPE][order(-TOTAL_DEST)]
+
+head(dest_decs)
+```
+
+```
+##       EVTYPE DECADE COMB_DEST
+## 1:   TORNADO  1950s  237689.4
+## 2: TSTM WIND  1950s       0.0
+## 3:      HAIL  1950s       0.0
+## 4:   TORNADO  1960s  328469.4
+## 5: TSTM WIND  1960s       0.0
+## 6:      HAIL  1960s       0.0
+```
+
+```r
+head(dest_all)
+```
+
+```
+##               EVTYPE TOTAL_DEST
+## 1:           TORNADO  3312276.7
+## 2:       FLASH FLOOD  1599325.1
+## 3:         TSTM WIND  1445168.2
+## 4:              HAIL  1268289.7
+## 5:             FLOOD  1067976.4
+## 6: THUNDERSTORM WIND   943635.6
+```
 
 
 # Results

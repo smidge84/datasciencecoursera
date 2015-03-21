@@ -45,13 +45,14 @@ names(noaa_data)
 ```
 The variables of particular interest include:  
 
+* BGN_DATE
 * EVTYPE
 * FATALITIES
 * INJURIES
 * PROPDMG
 * CROPDMG
 
-# Event Serverity with respect to Public Health
+## Event Severity with respect to Public Health
 To assess which events are most harmful to public health lets look at those events which have the highest number fatalities and injuries. First lets subset our data for the required fields and look into the different event types.
 
 ```{r health, echo=TRUE, warning=FALSE, message=FALSE}
@@ -93,6 +94,62 @@ head(res_health, n=10)
 ```
 To assess the level of *harm* for each event type, the number of fatalities and injuries were added together. The above table shows the top 10 most harmful event types. The number one most harmful evet type is **`r res_health$EVTYPE[1]`** with a total of **`r res_health$harm[1]`** fatalities and injuries.  
 
+## Economic Consequences of Severe Weather Events
+To investigate which severe weather events have greatest economic consequences, let us consider the values of damage done to property and to crops. As before, first lets subset our complete data set for the following variabes of intrest:
+
+* BGN_DATE
+* EVTYPE
+* PROPDMG
+* CROPDMG
+
+The date of the event can be of interest so we can look at changes in economic damage over time. Of all the date information available in the data set, we will only conside the date when the event started to categorise the time period the event belongs in. This will remove problems when an event persists across years.  
+To investigate this query, the data processing has been completed using the `data.table` package as it is very efficient and concise when coding.
+
+```{r eco_init, echo=TRUE, message=FALSE, warning=FALSE}
+library(data.table)
+## creating a data.table version of the original data for efficient processing
+
+noaa_dt <- data.table(noaa_data)
+
+## Selecting only the required variables
+eco1_dt <- noaa_dt[, .(BGN_DATE, EVTYPE, PROPDMG, CROPDMG)]
+
+## Removing the 'summary' records as definer earlier
+#eco_dt <- eco1_dt[ EVTYPE == sum_evts$EVTYPE] #<- not working correctly
+eco_dt <- eco1_dt %>% filter(!str_detect(EVTYPE, reg_exp))
+```
+Again the *'summary'* event records were removed as their values will be duplicated in the associated event record.  
+In the original data set, the dates are `string` arrays. To copute them easier, it is better that they are variables of the `Date` class.
+```{r eco_date}
+## converting the date variable from a string to the Date class
+eco_dt[, BGN_DATE := as.Date(BGN_DATE, "%m/%d/%Y")]
+
+## Grouping Dates into Decades for later comparison
+decs_seq <- seq(as.Date("01/01/1950", "%m/%d/%Y"), length.out=8, by="10 year")
+dec_labs <- c("1950s", "1960s", "1970s", "1980s", "1990s", "2000s", "2010s")
+eco_dt[, DECADE := cut(BGN_DATE, decs_seq, labels = dec_labs)]
+
+d1 <- eco_dt[, BGN_DATE][1] ## First date
+dx <- eco_dt[, BGN_DATE][dim(eco_dt)[1]] ## Last date
+yrs <- length(seq(d1, dx, by="year")) ## Calculate number of years
+```
+The first record date is: `r d1` and the last record date is: `r dx` which spans a total of `r yrs`. Since this spans a long time period, it might be more convenient for a quick analysis to reduce the resolution by looking at the values across each decade. In order to achieve this the continuous dates values were converted into descrite decade values using a factor variable. The code chunck below shows the first six records and illustrates how a new factor variable `DECADE` has been created.
+```{r eco_date2, results='markup'}
+head(eco_dt)
+
+```
+Two new data tables are created below. The first computes the total (economic) destruction for each event type for by decade. The total destruction is defined as the sum of property damage and crop damage *(combined destruction)*. The second data table is the total destruction, defined similarly, over the whole of the data set *(total destruction)*.
+```{r eco_proc}
+## Computing the total destruction of each event type by decade
+dest_decs <- eco_dt[, .(COMB_DEST = sum(PROPDMG) + sum(CROPDMG)), by=.(EVTYPE, DECADE)][order(DECADE, -COMB_DEST)]
+## used data.table chaining to re-order the results for readability
+
+## Computing the total (economic) destruction for each event type over whole date range
+dest_all <- eco_dt[, .(TOTAL_DEST = sum(PROPDMG) + sum(CROPDMG)), by=EVTYPE][order(-TOTAL_DEST)]
+
+head(dest_decs)
+head(dest_all)
+```
 
 
 # Results
