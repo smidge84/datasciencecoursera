@@ -1,0 +1,85 @@
+Statistical Inference Course Project Plan
+
+The reports can not be more than 3 pages long.
+They should be created using RMarkdown and use Knitr to create a PDF version.
+
+## PART 1 ##
+Exponential distribution Vs Central Limit Theorem
+
+exp_dist <- rexp(n, lambda)
+mean = 1/lambda & sd = 1/lambda
+lambda = 0.2
+
+> We are going to investigate the distribution of the mean of n=40 different exponential distributions
+
+probably remember to set.seed() to the analysis is reproducible.
+Q1) MEAN
+the theoretical mean (t_mn) is 1/0.2 = 5
+smp_mn <- mean(exp_dist)
+
+compare t_mn & smp_mn
+
+Q2) VARIANCE
+theoretical variance (t_var) = sd^2 = (1/0.2)^2 = 25
+Sample Variance needs to be calculated. It is the squared distance from the mean
+function sd() will give the standard deviation => var = sd^2/n
+or we could calculate it too as the sum of squared distances from the mean, but we must divide by n-1 no n -> no bias
+
+smp_var <- sum((exp_dist - mean)^2) / n-1
+
+Q3) APPROX NORMAL
+To do this we need to compare the distribution of a large collection of random exponentials rexp(1000, lambda)
+and a large collection of means of 40 random exponential distributions.
+
+dist1 <- rexp(1000, lambda)
+
+mns = NULL
+for (i in 1:1000) mns = c(mns, mean(rexp(n, lambda)))
+
+compare hist(dist1) & hist(mns)
+create a facet plot using ggplot2
+probably need to merge the data into on set for plotting, using cbind
+
+
+ILLUSTRATIONS
+Create a histogram of the population. This will show where the most commonly generated numbers occur, which should be around the mean.
+
+REPORT STRUCTURE
+
+1. Introduction/Overview
+2. Description of the simulations you ran
+3. Tests you performed to assess normality
+4. Results
+5. Conclusions reached
+
+STRUCTURE 2
+
+1. Title (give an appropriate title) and Author Name
+2. Overview: In a few (2-3) sentences explain what is going to be reported on.
+3. Simulations: Include English explanations of the simulations you ran, with the accompanying R code. Your explanations should make clear what the R code accomplishes.
+4. Sample Mean versus Theoretical Mean: Include figures with titles. In the figures, highlight the means you are comparing. Include text that explains the figures and what is shown on them, and provides appropriate numbers.
+5. Sample Variance versus Theoretical Variance: Include figures (output from R) with titles. Highlight the variances you are comparing. Include text that explains your understanding of the differences of the variances.
+6. Distribution: Via figures and text, explain how one can tell the distribution is approximately normal.
+
+
+
+
+### PART 2 ###
+
+Tooth Growth Dataset
+
+When stating assumptions made, it means things like:
+* was the data paired groups or independent groups
+* t testing seems obvious because the sample size of each group is small (10) with 6 groups, so only 60 independent subjects in total
+	Thus we should avoid using the normal distribution and performing a z-test. If the sample sizes were larger we could use a z-test to make
+	thing simpler and approximate the answer because we know by the Central Limit Theorem that as the sample size of each sub-population grows
+	the mean of each sub-population behaves more like a normal distribution.
+* with t-tests do we assume constant variance across groups or non-constant variance? If unsure go with constant variance
+
+EXPLAINATION OF DATASET
+
+The data consists of measurements of the mean length of the odontoblast cells harvested from the incisor teeth of a population of 60 guinea pigs. These animals were divided into 6 groups of 10 and consistently fed a diet with one of 6 Vitamin C supplement regimes for a period of 42 days. The Vitamin C was administered either in the form of Orange Juice (OJ) or chemically pure Vitamin C in aqueous solution (VC). Each animal received the same daily dosage of Vitamin C (either 0.5, 1.0 or 2.0 milligrams) consistently. Since each combination of supplement type and dosage was given to 10 randomly selected animals this required a total of 60 animals for the study. After 42 days, the animals were euthanized, their incisor teeth were harvested and subject to analysis via optical microscopy to determine the length (in microns) of the odontoblast cells (the layer between the pulp and the dentine). The ToothGrowth data set therefore consists of 60 observations of the 3 variables - mean length of odontoblasts (microns), supplement type (OJ or VC) and Vitamin C dosage (milligrams/day).
+
+*** " Remember that the original author's goal was to determine whether odontoblast cell length was a reliable test for Vitamin C intake."
+
+

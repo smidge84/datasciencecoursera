@@ -1,0 +1,175 @@
+---
+title: "Statistical Inference Project Part 2"
+author: "Rich Robinson"
+date: "Friday, May 22, 2015"
+output: html_document
+---
+
+The original author's goal was to determine whether odontoblast cell length was a reliable test for Vitamin C intake. Can we answer this question?
+
+The data consists of measurements of the mean length of the odontoblast cells harvested from the incisor teeth of a population of 60 guinea pigs. These animals were divided into 6 groups of 10 and consistently fed a diet with one of 6 Vitamin C supplement regimes for a period of 42 days. The Vitamin C was administered either in the form of Orange Juice (OJ) or chemically pure Vitamin C in aqueous solution (VC). Each animal received the same daily dosage of Vitamin C (either 0.5, 1.0 or 2.0 milligrams) consistently. Since each combination of supplement type and dosage was given to 10 randomly selected animals this required a total of 60 animals for the study. After 42 days, the animals were euthanized, their incisor teeth were harvested and subject to analysis via optical microscopy to determine the length (in microns) of the odontoblast cells (the layer between the pulp and the dentine). The ToothGrowth data set therefore consists of 60 observations of the 3 variables - mean length of odontoblasts (microns), supplement type (OJ or VC) and Vitamin C dosage (milligrams/day).
+
+T-tests seem an obvious choice for the numerical analysis because the sample size of each group is small (10 subjects) with 6 groups, so only 60 independent subjects in total. We should avoid using the normal distribution and z-tests. If the sample size was much larger we could use a z-test to make things simpler and approximate the solution because we know by the Central Limit Theorem that as the sample size of each sub-population grows, the mean of each sub-population behaves more like a normal distribution.
+
+All numerical/data manipulation was performed using the `dplyr` package in `R`.
+
+## Assumptions
+
+When performing this data analysis of tooth growth in Guinea Pigs we have assumed that all the Guniea Pigs are individual and were sufficiently randomly chossen to represent a good sample of the population of all Guinea Pigs.  
+Also during the t-tests we have assumed that all the values are not paired (from individual subjects) and variances between the sample groups are not equal.
+
+## Understanding our dataset
+
+```{r init, echo=TRUE}
+library(datasets)
+
+data(ToothGrowth)
+
+dim(ToothGrowth)
+
+head(ToothGrowth)
+
+unique(ToothGrowth$supp)
+
+unique(ToothGrowth$dose)
+
+```
+
+
+## Comparing Tooth Growth by Supplement and Dosage
+
+```{r mu_by_grp, echo=TRUE, message=FALSE, warning=FALSE, fig.align='center'}
+library(dplyr)
+library(ggplot2)
+
+mu_by_grp <- ToothGrowth %>% group_by(supp, dose) %>% summarise_each(funs(mean))
+
+var_by_grp <- ToothGrowth %>% group_by(supp, dose) %>% summarise_each(funs(sd))
+
+g1 <- ggplot(ToothGrowth, aes(x=len, fill = factor(dose))) + facet_grid(supp ~ dose)
+g1 <- g1 + geom_histogram()
+g1 <- g1 + labs(title = "Histograms of Odontoblast Cell Length after 42 Days\nBy Supplement Type & Dosage") + labs(x = "Cell Length (microns)", y = "Count") + theme(legend.position="none")
+g1
+```
+
+This conditional plot of histograms shows a quick overview of our dataset. By visual comparision it can be seen that there is a general trend that as the dosage of vitamin C increases then so too does the length of the Odontoblast cells. This is true for both vitamin C sources, however the measurements for pure vitamin C (VC) seem a little more variable.
+
+Next we should perform a numerical statistical analysis to support the pattern shown in the histograms.
+
+```{r plots2, echo=FALSE, fig.align='center'}
+
+## merging the data into a single data.frame
+sum_grp <- left_join(mu_by_grp, var_by_grp, by=c("supp", "dose"))
+names(sum_grp) <- c("supp", "dose", "mu", "sigma")
+## now convert from wide to long format for ease of plotting
+library(tidyr)
+sum_grp_long <- gather(sum_grp, "stat", "val", 3:4)
+
+g4 <- ggplot(sum_grp_long, aes(x=factor(dose), y=val, group=supp, colour=supp)) + geom_line(size=1) + geom_point(size=2) + labs(x = "Dosage (milligrams per day)", y = "Cell Length (microns)") + facet_grid(stat ~ ., scales = "free_y") + labs(title = "Mean (mu) & Standard Error (sigma) of Odontoblast Cell Length\nfor each Dosage by Supplement") + scale_colour_discrete(name="Supplement\nType")
+g4
+
+```
+
+## T-Test of Mean Difference by Supplement Type
+
+From visual analysis it can be seen that there is some relation between dosage size and the amount of tooth growth observed. What is less clear is if there is a relationship between the supplement type and observed tooth growth. To evauate this we will ignore the dosage values in our data set.
+Stating this more formally we have the following hypothesis:
+
+$H_0 =$ Supplement type does not affect tooth growth
+
+```{r t-test, echo=TRUE}
+t1 <- t.test(len~supp, paired = FALSE, var.equal = FALSE, data = ToothGrowth)
+t1
+t1_df <- t1$parameter
+
+t1_95 <- qt(0.95, t1_df)
+
+```
+
+From the t-test comparing the mean values of both supplement types (irrespective of dosage) we discover the following characteristics:
+
+```{r t-test1b, echo=FALSE, results='markup'}
+res1 <- data.frame(t_stat = t1$statistic, p_val = t1$p.value, low_conf = t1$conf[1], high_conf = t1$conf[2])
+
+res1
+```
+
+The test statistic t = `r round(t1$statistic, 3)` which is greater than `r round(t1_95, 3)`, the 95^th^ percentile of the T-distribution with the same degrees of freedom, df = `r round(t1_df, 3)`. This means that we would reject the null hypothesis. However the confidence interval is between `r round(t1$conf[1], 3)` and `r round(t1$conf[2], 3)` which contains zero so we cannot rule out the possibility of no difference in means for the two groups and would result that we fail to reject the null hypothesis. Thus the above test is inconclusive.
+
+## T-Test of Mean Difference by Supplement Type Individually
+
+To analyise this further let perform the same t-test as above but on each dosage level separately.
+
+```{r t-test1c, echo=FALSE, results='markup'}
+## subsetting our data set
+
+tg_05 <- filter(ToothGrowth, dose == 0.5)
+tg_1 <- filter(ToothGrowth, dose == 1.0)
+tg_2 <- filter(ToothGrowth, dose == 2.0)
+
+t_05 <- t.test(len~supp, paired = FALSE, var.equal = FALSE, data = tg_05)
+t_1 <- t.test(len~supp, paired = FALSE, var.equal = FALSE, data = tg_1)
+t_2 <- t.test(len~supp, paired = FALSE, var.equal = FALSE, data = tg_2)
+
+res_05 <- data.frame(t_stat = t_05$statistic, p_val = t_05$p.value, low_conf = t_05$conf[1], high_conf = t_05$conf[2])
+res_1 <- data.frame(t_stat = t_1$statistic, p_val = t_1$p.value, low_conf = t_1$conf[1], high_conf = t_1$conf[2])
+res_2 <- data.frame(t_stat = t_2$statistic, p_val = t_2$p.value, low_conf = t_2$conf[1], high_conf = t_2$conf[2])
+
+res1b <- round(rbind(res_05, res_1, res_2), 3)
+rownames(res1b) <- c("0.5mg", "1.0mg", "2.0mg")
+
+res1b <- cbind(res1b, t95 = round(c(qt(0.95, t_05$parameter), qt(0.95, t_1$parameter), qt(0.95, t_2$parameter)), 3))
+
+res1b ## To print to doc
+
+```
+
+From the results shown above we can conclude that in the case of dosages of 0.5mg and 1.0mg there is significant difference between the supplement types. as shown by the positive values for their t statistics which are greater than the corresponding value of the 95^th^ percentile. This is supported by the t confidence intervals which do not contain zero, meaning that there is significant difference between the supplement means. Thus we **reject** the null hypothesis. Also because the test statistics are positive this concludes that the mean tooth growth for delivery method `OJ` is greater than that of `VC`, which is not surprising when compared to the earlier histograms.
+
+However in the case of 2.0mg dosages of vitamin C there is no significant differences in the mean values because the test statistic is less than the 95^th^ percentile. Also the t confidence interval contains zero meaning we cannot rule out the possibility of no difference in mean values between delivery methods. Thus in this case we **fail to reject** the null hypothesis.
+
+## T-Test for Mean Difference by Dosage
+
+With this t-test we can assess if there is significant difference in Odontoblast cell length depending on the dosage level of vitamin C irrespective of delivery method. This suggests the following null hypothesis:
+
+$H_0 =$ Dosage level does not affect tooth growth
+
+In this analysis, the different dosage levels will be cross-evaluated against each other (0.5mg against 1.0mg & 2.0mg, 1.0mg against 2.0mg).
+
+```{r t_test2, echo=FALSE}
+## Subsetting our data set
+d_0.5v1 <- filter(ToothGrowth, dose %in% c(0.5, 1.0))
+d_0.5v2 <- filter(ToothGrowth, dose %in% c(0.5, 2.0))
+d_1v2 <- filter(ToothGrowth, dose %in% c(1.0, 2.0))
+
+## t-tests
+t_0.5v1 <- t.test(len~dose, paired=FALSE, var.equal=FALSE, data = d_0.5v1)
+t_0.5v2 <- t.test(len~dose, paired=FALSE, var.equal=FALSE, data = d_0.5v2)
+t_1v2 <- t.test(len~dose, paired=FALSE, var.equal=FALSE, data = d_1v2)
+
+## gathering results
+r_0.5v1 <- data.frame(t_stat = t_0.5v1$statistic, p_val = t_0.5v1$p.value, low_conf = t_0.5v1$conf[1], high_conf = t_0.5v1$conf[2], t95 = qt(0.95, t_0.5v1$parameter))
+
+r_0.5v2 <- data.frame(t_stat = t_0.5v2$statistic, p_val = t_0.5v2$p.value, low_conf = t_0.5v2$conf[1], high_conf = t_0.5v2$conf[2], t95 = qt(0.95, t_0.5v2$parameter))
+
+r_1v2 <- data.frame(t_stat = t_1v2$statistic, p_val = t_1v2$p.value, low_conf = t_1v2$conf[1], high_conf = t_1v2$conf[2], t95 = qt(0.95, t_1v2$parameter))
+
+res2 <- rbind(r_0.5v1, r_0.5v2, r_1v2)
+rownames(res2) <- c("0.5mg v 1mg", "0.5mg v 2mg", "1mg v 2mg")
+res2
+
+```
+In all three scenarious above we **reject the null hypothesis**, because with significant difference between the mean values for each groups it supports that the dosage amount does affect the mean level of tooth growth. The criteria the must be satisfied to reject the null hypothesis are:
+
+* The absolute value of the test statistis (`t_stat`) is greater than the 95^th^ percentile of the T-distribution for the sample.
+* The T confidence interval (`[low_conf, high_conf]`) does not contain zero, ruling out the possibility of zero difference in means.
+* The p-value (`p_val`) is small and is small than the $\alpha$ value where $\alpha$ = 1 - significance level = 1 - 0.95 = 0.05 in our case.
+
+## Conclusions
+
+From our analysis of the different delivery methods (supplement types) it has been shown that when the dosage is small (0.5mg/day or 1.0mg/day) then there is a difference in observed tooth growth, namely that the vitamin C source from orange juice yields better results than vitamin C from an chemical source disolved in water. This was particularly so with a dosage level of 0.5mg/day. However for the larger dosage level (2.0mg/day) we were unable to significantly show a difference in tooth growth, so we conclude that the supplement source does not affect tooth growth.
+
+In the analysis of the dosage levels it was clearly shown, as expected, that they do yield siginficant differences in affects, namely that the second group in the tests (which was consistantly that of the higher dosage level) yields a higher mean tooth growth than the first group.
+
+End of Analysis
+

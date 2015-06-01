@@ -1,0 +1,104 @@
+---
+title: "Statistical Inference Project Part 1"
+author: "Rich Robinson"
+date: "Monday, May 18, 2015"
+output: html_document
+---
+
+This part of the project explores the exponential distribution and compares the exact form provided by R functions with the approximated form provided by the Central Limit Theorem. Comparisons are made betweek the theoretical values for the mean and variance, calculated from the details given about our distribution, and those calculated from our simulated sample data.
+
+Defining the attributes of our distribution. These are:
+
+* lambda - the exponential rate
+* mu - theoretical mean
+* sd - theoretical standard deviation
+* n - number of samples, values or distributions
+* nosim - number of simulations/distributions
+```{r atts, echo=TRUE}
+lambda <- 0.2
+mu <- 1 / lambda
+sd <- 1 / lambda
+n <- 40
+nosim <- 1000
+```
+## Simulations
+
+To create our sample distribution to attain comparisons between the theoretical values of mean and variance against those for our sample, a single large sample of `n` X `nosim` variables was generated using the `rexp()` function in `R` with the parameter $\lambda$ as defined above. This single distribution was then subdivided into a `nosim` by `n` matrix to create our `r nosim` individual samples.
+
+To illustrate that our sample is approximately a Normal disribution although it is actually an Exponential distribution required using the Central Limit Theorem which states that the means of small samples from a larger population are distributed like a normal distribution and as the sample size of these groups increases, then the behavior of the means becomes more close to a notmal distribution. This was illustrated by visual comparison against a normal distribution characterised by the same parameters as our exponential distribution (just to make the comparison clearer). The `rnorm()` function with parameters n=`r n`, $\mu$=`r mu` and $\sigma$=`r sd` was called `r nosim` times, with the mean from each distribution stored in a numerical vector array.
+
+To ensure that all these simulations are reproducible, the `set.seed()` function was executed at the beginning.
+
+## Sample Mean Vs Theoretical Mean
+
+Here we create a `r nosim` random exponential distributions by firstly creating a single exponential distribution of `r n * nosim` variables then forming a `r nosim` by `r n` matrix from these values.
+```{r Q1, echo=FALSE}
+set.seed(101) ## So that the same random distribution is used every time
+
+dat <- matrix(rexp(n*nosim, lambda), nosim) ## matrix of rexp data split into 'nosim' rows
+
+smp_mns <- apply(dat, 1, mean) ## apply mean function by rows of dat
+
+m <- matrix(head(round(smp_mns, 3), 20), 4, 5)
+print(m)
+data.frame(smp_mu = round(mean(smp_mns), 3), mu = mu)
+```
+The matrix formed in the code block above shows the means of the first 20 random distributions in our sample. It is clear to see that these range from `r min(m)` to `r max(m)`, centered around our expected mean value of `r mu`. 
+Further more, for quick direct comparison the mean of all our sample means is `r mean(smp_mns)` which is extremely close to our expected value of `r mu`.
+
+```{r plot1, echo=FALSE, warning=FALSE, message=FALSE, fig.align='left', fig.width=5, fig.height=4}
+library(ggplot2)
+library(tidyr)
+## a little bit of data manipulation is required to get the matrix into a form suitable for plotting, a long format of tidy data
+tmat <- cbind(seq(1, nosim, 1), dat)
+tdf <- data.frame(tmat)
+tdf <- gather(tdf, "pos", "vals", 2:(n+1))
+
+h1 <- ggplot(tdf, aes(x=vals)) + geom_histogram(aes(fill = ..count..)) + labs(x="Value", y="Count") + labs(title="Our Random Exponential Distribution")
+h1
+```
+This histogram shows the distribution of values in our example. It is clear to see that it is a negative exponential distribution and although the majority of the values are close to zero and less than our expected mean, the few high outlying values offset these to bring the mean towards the expected value.
+
+## Sample Variance Vs Theoretical Variance
+
+Using the same random exponential distribution as in question 1, we are going to compare how the variance of our distribution is against the theoretical variance calculated from the parameters.
+
+```{r Q2, echo=FALSE}
+sigma = sd(dat)
+
+data.frame(smp_var = round(sigma^2, 3), var = sd^2)
+```
+
+The output above shows the variance of our distribution *(`smp_var`)* against the theoretical variance *(`var`)*. Our expected variance for this distribution is `r sd^2`, our calculated variance of `r round(sigma^2, 3)` is pretty close.
+
+## Distribution
+
+The Central Limit Theorem states that although a distribution may not be normal in itself, if it is split into smaller distributions then the means of the sub-distributions will be approximately normally distributed.
+
+```{r Q3, echo=FALSE, warning=FALSE, message=FALSE, fig.align='center'}
+## compare histogram of means from 1000 exponential distributions with that of normal distributions
+
+nml_mns <- NULL
+for (i in 1 : nosim) nml_mns = c(nml_mns, mean(rnorm(n, mean=mu, sd=sd))) 
+## putting the data together into a data frame for plotting
+
+dat3 <- data.frame(x=seq(1, nosim, 1), exp_mns = smp_mns, nml_mns)
+## convting the data into a long format for ease of plotting
+dat3 <- gather(dat3, "distType", "mean", 2:3)
+
+## List and labelling function to modify the facet names
+distNames = list("exp_mns" = "Exponential Distribution", "nml_mns" = "Normal Distribution")
+
+distLab <- function(variable, value){
+  return(distNames[value])
+}
+## ^^
+
+h3 <- ggplot(dat3, aes(x=mean, fill = factor(distType))) + facet_grid(. ~ distType, labeller=distLab)
+h3 <- h3 + geom_histogram(aes(y = ..density..)) + geom_density(size=1)
+h3 <- h3 + labs(title = "Histograms of Means for both Exponential & Normal Distributions") + labs(x = "Mean", y = "Density")
+h3 <- h3 + theme(legend.position="none")
+h3
+```
+
+The left histogram shows the distribution of means from `r nosim` exponential distributions of `r n` randomly generated variables with the attributes at the start. Although the upper tail is slightly stretched it does look very Gaussian in shape. For comparison the right histogram shows the distribution of means of `r nosim` normal distributions of `r n` randomly generated variables with attributes the same as those used in out exponential distributions. The general shape of both distributions are very similar. Thus we can suggest that the exponential distribution does behave similar to a normal distribution.
