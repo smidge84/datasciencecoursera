@@ -20,7 +20,7 @@ library(ggplot2)
 
 ```
 
-## Executive Summary
+### Executive Summary
 
 This analysis explores the relationship between the transmission type of cars and the affect this has on fuel efficiency, measured in Miles per gallon (MPG). In particular the analysis needs to address the following points:
 
@@ -29,7 +29,7 @@ This analysis explores the relationship between the transmission type of cars an
 
 To answer the above questions the analysis will first look into the basic statistical properties of the data using mean and standard deviation to gain a general idea of trends. Followering this a more detailed statitical analysis will include the fitting of linear models which can be used to predict future values within a level of confidence.
 
-## Exploring the Data Set
+### Exploring the Data Set
 
 We are looking at the *mtcars* dataset provided in `R`, so let's load it and have a look.
 
@@ -56,12 +56,30 @@ g1 <- g1 + geom_point(data = stats, aes(x = trans, y = mean), color = "blue", si
 
 ```
 
-The plot in appendix A shows the recorded MPG by transmission type. By observation it can be seen that for cars with automatic transmission the MPG is generally lower than that of manual cars. Also the range of MPG values for automatic cars is much smaller (more concentrated) than that of manual cars. The blue point for each transmission type represents the mean value of the data. The mean MPG for cars with automatic transmission is `r round(stats$mean[1], 3)` MPG and the mena sofr manual cars is `r round(stats$mean[2], 3)` MPG, which confirms the trend of higher MPG for manual cars. To qualtify the spread of the data we can look at the standard deviation from the mean. The standard deviation of automatic cars is `r round(stats$sd[1], 3)` MPG which is lower than that for manual cars of `r round(stats$sd[2], 3)` MPG, which indicates a range of values closer to the mean.
+The plot in appendix A shows the recorded MPG by transmission type. By observation it can be seen that for cars with automatic transmission the MPG is generally lower than that of manual cars. Also the range of MPG values for automatic cars is much smaller (more concentrated) than that of manual cars. The blue point for each transmission type represents the mean value of the data. The mean MPG for cars with automatic transmission is `r round(stats$mean[1], 3)` MPG and the mean for manual cars is `r round(stats$mean[2], 3)` MPG, which confirms the trend of higher MPG for manual cars. To qualtify the spread of the data we can look at the standard deviation from the mean. The standard deviation of automatic cars is `r round(stats$sd[1], 3)` MPG which is lower than that for manual cars of `r round(stats$sd[2], 3)` MPG, which indicates a range of values closer to the mean.
 
+### Attribute Correlations
 
-### Appendix A - Plot & code of MPG vs Transmission
+It is logical that more attributes will affect MPG than just transmission type. Now lets look for strong correlations between other attributes and MPG using the `corr()` function.
+
+```{r corrs}
+## calculating correlations of the data
+tmp <- cor(mtcars, mtcars$mpg)
+corrs <- data.frame(attr = rownames(tmp), corr = tmp[,1])
+## arranging into order of significance by ABS value to preserve relationship (positive or negative)
+corrs <- arrange(corrs, desc(abs(corr)))
+corrs
+```
+
+The output above shows that many attributes have a stronger affect on MPG than transmission type (am), namely weight, cylinders, displacement, horse power. This would suggest that a multivariate regression model would better predict the possible MPG of a vehicle. Lets look into this further. (See appendix B for the code for the above calculation)
+
+### Appendix A - Code & Plot of MPG vs Transmission
 ```{r data_exp, echo=TRUE, eval=FALSE}
 ```
 ```{r app_a, fig.cap="Figure 1"}
 g1
+```
+
+### Appendix B - Code Calculating Correlations between Attributes
+```{r corrs, echo=TRUE, eval=FALSE}
 ```

@@ -75,8 +75,8 @@ code > span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Inf
 </div>
 
 
-<div id="executive-summary" class="section level2">
-<h2>Executive Summary</h2>
+<div id="executive-summary" class="section level3">
+<h3>Executive Summary</h3>
 <p>This analysis explores the relationship between the transmission type of cars and the affect this has on fuel efficiency, measured in Miles per gallon (MPG). In particular the analysis needs to address the following points:</p>
 <ul>
 <li>Is an automatic or manual transmission better for MPG?</li>
@@ -84,8 +84,8 @@ code > span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Inf
 </ul>
 <p>To answer the above questions the analysis will first look into the basic statistical properties of the data using mean and standard deviation to gain a general idea of trends. Followering this a more detailed statitical analysis will include the fitting of linear models which can be used to predict future values within a level of confidence.</p>
 </div>
-<div id="exploring-the-data-set" class="section level2">
-<h2>Exploring the Data Set</h2>
+<div id="exploring-the-data-set" class="section level3">
+<h3>Exploring the Data Set</h3>
 <p>We are looking at the <em>mtcars</em> dataset provided in <code>R</code>, so let’s load it and have a look.</p>
 <pre><code>##                    mpg cyl disp  hp drat    wt  qsec vs am gear carb
 ## Mazda RX4         21.0   6  160 110 3.90 2.620 16.46  0  1    4    4
@@ -100,11 +100,27 @@ code > span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Inf
 ##       trans     mean       sd
 ## 1 automatic 17.14737 3.833966
 ## 2    manual 24.39231 6.166504</code></pre>
-<p>The plot in appendix A shows the recorded MPG by transmission type. By observation it can be seen that for cars with automatic transmission the MPG is generally lower than that of manual cars. Also the range of MPG values for automatic cars is much smaller (more concentrated) than that of manual cars. The blue point for each transmission type represents the mean value of the data. The mean MPG for cars with automatic transmission is 17.147 MPG and the mena sofr manual cars is 24.392 MPG, which confirms the trend of higher MPG for manual cars. To qualtify the spread of the data we can look at the standard deviation from the mean. The standard deviation of automatic cars is 3.834 MPG which is lower than that for manual cars of 6.167 MPG, which indicates a range of values closer to the mean.</p>
-\newpage
-
-<div id="appendix-a---plot-code-of-mpg-vs-transmission" class="section level3">
-<h3>Appendix A - Plot &amp; code of MPG vs Transmission</h3>
+<p>The plot in appendix A shows the recorded MPG by transmission type. By observation it can be seen that for cars with automatic transmission the MPG is generally lower than that of manual cars. Also the range of MPG values for automatic cars is much smaller (more concentrated) than that of manual cars. The blue point for each transmission type represents the mean value of the data. The mean MPG for cars with automatic transmission is 17.147 MPG and the mean for manual cars is 24.392 MPG, which confirms the trend of higher MPG for manual cars. To qualtify the spread of the data we can look at the standard deviation from the mean. The standard deviation of automatic cars is 3.834 MPG which is lower than that for manual cars of 6.167 MPG, which indicates a range of values closer to the mean.</p>
+</div>
+<div id="attribute-correlations" class="section level3">
+<h3>Attribute Correlations</h3>
+<p>It is logical that more attributes will affect MPG than just transmission type. Now lets look for strong correlations between other attributes and MPG using the <code>corr()</code> function.</p>
+<pre><code>##    attr       corr
+## 1   mpg  1.0000000
+## 2    wt -0.8676594
+## 3   cyl -0.8521620
+## 4  disp -0.8475514
+## 5    hp -0.7761684
+## 6  drat  0.6811719
+## 7    vs  0.6640389
+## 8    am  0.5998324
+## 9  carb -0.5509251
+## 10 gear  0.4802848
+## 11 qsec  0.4186840</code></pre>
+<p>The output above shows that many attributes have a stronger affect on MPG than transmission type (am), namely weight, cylinders, displacement, horse power. This would suggest that a multivariate regression model would better predict the possible MPG of a vehicle. Lets look into this further. (See appendix B for the code for the above calculation)</p>
+</div>
+<div id="appendix-a---code-plot-of-mpg-vs-transmission" class="section level3">
+<h3>Appendix A - Code &amp; Plot of MPG vs Transmission</h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat &lt;-<span class="st"> </span>mtcars %&gt;%<span class="st"> </span><span class="kw">select</span>(mpg, am)
 
 ## adding a new column with am variable as a factor
@@ -121,6 +137,14 @@ stats
 g1 &lt;-<span class="st"> </span>g1 +<span class="st"> </span><span class="kw">geom_point</span>(<span class="dt">data =</span> stats, <span class="kw">aes</span>(<span class="dt">x =</span> trans, <span class="dt">y =</span> mean), <span class="dt">color =</span> <span class="st">&quot;blue&quot;</span>, <span class="dt">size =</span> <span class="dv">3</span>)</code></pre></div>
 <p><img src="figs/app_a-1.png" title="Figure 1" alt="Figure 1" style="display: block; margin: auto;" /></p>
 </div>
+<div id="appendix-b---code-calculating-correlations-between-attributes" class="section level3">
+<h3>Appendix B - Code Calculating Correlations between Attributes</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## calculating correlations of the data
+tmp &lt;-<span class="st"> </span><span class="kw">cor</span>(mtcars, mtcars$mpg)
+corrs &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">attr =</span> <span class="kw">rownames</span>(tmp), <span class="dt">corr =</span> tmp[,<span class="dv">1</span>])
+## arranging into order of significance by ABS value to preserve relationship (positive or negative)
+corrs &lt;-<span class="st"> </span><span class="kw">arrange</span>(corrs, <span class="kw">desc</span>(<span class="kw">abs</span>(corr)))
+corrs</code></pre></div>
 </div>
 
 

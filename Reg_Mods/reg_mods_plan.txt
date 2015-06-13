@@ -19,24 +19,33 @@ cars, they are interested in exploring the relationship between a set of variabl
 	Interpret Coefficient correctly => fit of a linear model and what the expected values mean
 	Do some exploratory data analysis => at start look at structure of data and any general patterns, some quick plots
 	Fit multiple models and explain reasons behind model selection => standard fit, mean centring fit, no intercept?
+		> might not be models above, more like a model mpg ~ am, or mpg ~ multiple variables (am, wt, gears, cyl etc.)
+		> how to choose which variables? Which have strongest affect on mpg (not explained by other variables)?
+		> see week lectures
 	Conclusions - answering questions of interest (of why not answerable)
 	Residual plot and diagnostics - to show how well the models fit the data
 	Quantify uncertainty in models and perform an inference
 -------------------------
 
 # Plan
+	0) aim to follow the analysis structure performed in the lecture examples
 	1) import data set, subset into required data - turn transmission data into a factor (as it's discrete data)
 		> Predictor/Regressor(X) = Transmission / Outcome(Y) = MPG
 	2) basic exploratory data analysis to see what it looks like and possible trends
-		> conditional plot of facet plot???
+		> conditional plot or facet plot???
+		> matrix of correlations of MPG against other variables. This can help show which variables have the strongest affect MPG.
 	3) fit linear models
 		> research when to include or not include an intercept
-			> probably not in this case as the predictor is discrete and cannot be zero.
+			> The intercept is okay in this case because it is the mean(automatic) MPG.
 		> with intercept & slope
 		> with slope only
 		> mean centring (with or without intercept?)
+		> multiple models include a single variable and multiple variables
+		> how to choose the multiple variables to include? Week 3 lectures?
 		
 		
 # Misc
 Good example report
 http://rstudio-pubs-static.s3.amazonaws.com/20260_6b6ddcddd3ba4432804990538f00f179.html
+Search for examples:
+Regression Models Course Project
