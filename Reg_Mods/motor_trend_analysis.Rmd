@@ -4,8 +4,11 @@ author: "Rich Robinson"
 date: "Saturday, June 13, 2015"
 output:
   html_document:
+    css: ~/R/win-library/3.1/rmarkdown/rmd/h/bootstrap-3.3.1/css/bootstrap.css
     fig_caption: yes
-    theme: readable
+    highlight: tango
+    self_contained: no
+    theme: null
 ---
 ```{r global_opts, include=FALSE}
 knitr::opts_chunk$set(fig.align='center', fig.path='figs/',
@@ -56,7 +59,6 @@ g1 <- g1 + geom_point(data = stats, aes(x = trans, y = mean), color = "blue", si
 The plot in appendix A shows the recorded MPG by transmission type. By observation it can be seen that for cars with automatic transmission the MPG is generally lower than that of manual cars. Also the range of MPG values for automatic cars is much smaller (more concentrated) than that of manual cars. The blue point for each transmission type represents the mean value of the data. The mean MPG for cars with automatic transmission is `r round(stats$mean[1], 3)` MPG and the mena sofr manual cars is `r round(stats$mean[2], 3)` MPG, which confirms the trend of higher MPG for manual cars. To qualtify the spread of the data we can look at the standard deviation from the mean. The standard deviation of automatic cars is `r round(stats$sd[1], 3)` MPG which is lower than that for manual cars of `r round(stats$sd[2], 3)` MPG, which indicates a range of values closer to the mean.
 
 
-\newpage
 ### Appendix A - Plot & code of MPG vs Transmission
 ```{r data_exp, echo=TRUE, eval=FALSE}
 ```
