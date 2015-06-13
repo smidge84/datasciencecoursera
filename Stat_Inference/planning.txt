@@ -74,7 +74,7 @@ When stating assumptions made, it means things like:
 	Thus we should avoid using the normal distribution and performing a z-test. If the sample sizes were larger we could use a z-test to make
 	thing simpler and approximate the answer because we know by the Central Limit Theorem that as the sample size of each sub-population grows
 	the mean of each sub-population behaves more like a normal distribution.
-* with t-tests do we assume constant variance across groups or non-constant variance? If unsure go with constant variance
+* with t-tests do we assume constant variance across groups or non-constant variance? If unsure go with non-constant variance
 
 EXPLAINATION OF DATASET
 
