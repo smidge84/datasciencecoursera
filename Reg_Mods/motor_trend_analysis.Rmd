@@ -1,0 +1,65 @@
+---
+title: "Motor Trend Magazine"
+author: "Rich Robinson"
+date: "Saturday, June 13, 2015"
+output:
+  html_document:
+    fig_caption: yes
+    theme: readable
+---
+```{r global_opts, include=FALSE}
+knitr::opts_chunk$set(fig.align='center', fig.path='figs/',
+                      echo=FALSE, warning=FALSE, message=FALSE)
+## required libraries
+library(datasets)
+library(dplyr)
+library(ggplot2)
+
+```
+
+## Executive Summary
+
+This analysis explores the relationship between the transmission type of cars and the affect this has on fuel efficiency, measured in Miles per gallon (MPG). In particular the analysis needs to address the following points:
+
+* Is an automatic or manual transmission better for MPG?
+* Quantify the difference in MPG between manual and automatic transmissions
+
+To answer the above questions the analysis will first look into the basic statistical properties of the data using mean and standard deviation to gain a general idea of trends. Followering this a more detailed statitical analysis will include the fitting of linear models which can be used to predict future values within a level of confidence.
+
+## Exploring the Data Set
+
+We are looking at the *mtcars* dataset provided in `R`, so let's load it and have a look.
+
+```{r load_dat}
+data(mtcars)
+head(mtcars)
+```
+We can see from the above table there is much information in each record, but for our analysis we are only interested in the `mpg` and `am` columns. The `am` data is a boolean value signifying if the transmission type is manual (1) or automatic (0). For ease of later analysis, we shall convert this in a factor variable.
+```{r data_exp}
+dat <- mtcars %>% select(mpg, am)
+
+## adding a new column with am variable as a factor
+dat <- dat %>% mutate(trans = factor(am, labels = c("automatic", "manual")))
+
+g1 <- ggplot(dat, aes(x = trans, y = mpg)) + geom_point(color = dat$am+2)
+g1 <- g1 + labs(title = "MPG against Transmission Type") + labs(x = "Transmission Type") + labs(y = "Miles per Gallon (MPG)")
+
+## calculating some basic stats
+stats <- dat %>% select(mpg, trans) %>% group_by(trans) %>% summarise_each(funs(mean, sd))
+stats
+
+## adding the stats as reference points on plot
+g1 <- g1 + geom_point(data = stats, aes(x = trans, y = mean), color = "blue", size = 3)
+
+```
+
+The plot in appendix A shows the recorded MPG by transmission type. By observation it can be seen that for cars with automatic transmission the MPG is generally lower than that of manual cars. Also the range of MPG values for automatic cars is much smaller (more concentrated) than that of manual cars. The blue point for each transmission type represents the mean value of the data. The mean MPG for cars with automatic transmission is `r round(stats$mean[1], 3)` MPG and the mena sofr manual cars is `r round(stats$mean[2], 3)` MPG, which confirms the trend of higher MPG for manual cars. To qualtify the spread of the data we can look at the standard deviation from the mean. The standard deviation of automatic cars is `r round(stats$sd[1], 3)` MPG which is lower than that for manual cars of `r round(stats$sd[2], 3)` MPG, which indicates a range of values closer to the mean.
+
+
+\newpage
+### Appendix A - Plot & code of MPG vs Transmission
+```{r data_exp, echo=TRUE, eval=FALSE}
+```
+```{r app_a, fig.cap="Figure 1"}
+g1
+```

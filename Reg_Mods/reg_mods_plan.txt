@@ -1,0 +1,42 @@
+## Regression Models Course Project ##
+
+You work for Motor Trend, a magazine about the automobile industry. Looking at a data set of a collection of
+cars, they are interested in exploring the relationship between a set of variables and miles per gallon (MPG)
+(outcome). They are particularly interested in the following two questions:
+
+# Aims:
+1) "Is an automatic or manual transmission better for MPG"
+2) "Quantify the MPG difference between automatic and manual transmissions"
+
+# Check List:
+	RMarkdown document output to a PDF file
+	Main analysis - 2 pages
+	Appendix inc code and graphs - 3 pages
+	=> Total number of pages = 5
+	Opening executive summary paragraph
+
+# Points in peer assessment
+	Interpret Coefficient correctly => fit of a linear model and what the expected values mean
+	Do some exploratory data analysis => at start look at structure of data and any general patterns, some quick plots
+	Fit multiple models and explain reasons behind model selection => standard fit, mean centring fit, no intercept?
+	Conclusions - answering questions of interest (of why not answerable)
+	Residual plot and diagnostics - to show how well the models fit the data
+	Quantify uncertainty in models and perform an inference
+-------------------------
+
+# Plan
+	1) import data set, subset into required data - turn transmission data into a factor (as it's discrete data)
+		> Predictor/Regressor(X) = Transmission / Outcome(Y) = MPG
+	2) basic exploratory data analysis to see what it looks like and possible trends
+		> conditional plot of facet plot???
+	3) fit linear models
+		> research when to include or not include an intercept
+			> probably not in this case as the predictor is discrete and cannot be zero.
+		> with intercept & slope
+		> with slope only
+		> mean centring (with or without intercept?)
+		
+		
+# Misc
+Good example report
+http://rstudio-pubs-static.s3.amazonaws.com/20260_6b6ddcddd3ba4432804990538f00f179.html
