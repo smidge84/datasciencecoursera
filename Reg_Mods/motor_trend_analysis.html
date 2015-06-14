@@ -102,6 +102,10 @@ code > span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Inf
 ## 2    manual 24.39231 6.166504</code></pre>
 <p>The plot in appendix A shows the recorded MPG by transmission type. By observation it can be seen that for cars with automatic transmission the MPG is generally lower than that of manual cars. Also the range of MPG values for automatic cars is much smaller (more concentrated) than that of manual cars. The blue point for each transmission type represents the mean value of the data. The mean MPG for cars with automatic transmission is 17.147 MPG and the mean for manual cars is 24.392 MPG, which confirms the trend of higher MPG for manual cars. To qualtify the spread of the data we can look at the standard deviation from the mean. The standard deviation of automatic cars is 3.834 MPG which is lower than that for manual cars of 6.167 MPG, which indicates a range of values closer to the mean.</p>
 </div>
+<div id="fitting-a-linear-regression-model" class="section level3">
+<h3>Fitting a Linear Regression Model</h3>
+<p>It makes no sense to create a linear regression of MPG and transmission type as the predictor is a discrete quantity. A linear regression line would draw between the two discrete values, an area which is undefined. If we treat the transmission type as two separate groups, the best linear model will be a constant, namely the mean of the group, <span class="math inline">\(\beta_0 = \mu\)</span>, and <span class="math inline">\(\beta_1\)</span> (the slope) will be undefined. Thus we must look for more significant predictors to MPG.</p>
+</div>
 <div id="attribute-correlations" class="section level3">
 <h3>Attribute Correlations</h3>
 <p>It is logical that more attributes will affect MPG than just transmission type. Now lets look for strong correlations between other attributes and MPG using the <code>corr()</code> function.</p>
@@ -117,7 +121,7 @@ code > span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Inf
 ## 9  carb -0.5509251
 ## 10 gear  0.4802848
 ## 11 qsec  0.4186840</code></pre>
-<p>The output above shows that many attributes have a stronger affect on MPG than transmission type (am), namely weight, cylinders, displacement, horse power. This would suggest that a multivariate regression model would better predict the possible MPG of a vehicle. Lets look into this further. (See appendix B for the code for the above calculation)</p>
+<p>The output above shows that many attributes have a stronger affect on MPG than transmission type (am), namely weight, cylinders, displacement, horse power. This would suggest that a multivariate regression model would better predict the possible MPG of a vehicle, with predictors of weight, cylinders, displacement and horse power. Lets look into this further. (See appendix B for the code for the above calculation and a pairs plot for illustration)</p>
 </div>
 <div id="appendix-a---code-plot-of-mpg-vs-transmission" class="section level3">
 <h3>Appendix A - Code &amp; Plot of MPG vs Transmission</h3>
@@ -140,11 +144,16 @@ g1 &lt;-<span class="st"> </span>g1 +<span class="st"> </span><span class="kw">g
 <div id="appendix-b---code-calculating-correlations-between-attributes" class="section level3">
 <h3>Appendix B - Code Calculating Correlations between Attributes</h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## calculating correlations of the data
-tmp &lt;-<span class="st"> </span><span class="kw">cor</span>(mtcars, mtcars$mpg)
-corrs &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">attr =</span> <span class="kw">rownames</span>(tmp), <span class="dt">corr =</span> tmp[,<span class="dv">1</span>])
+foo &lt;-<span class="st"> </span><span class="kw">cor</span>(mtcars, mtcars$mpg)
+corrs &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">attr =</span> <span class="kw">rownames</span>(foo), <span class="dt">corr =</span> foo[,<span class="dv">1</span>])
 ## arranging into order of significance by ABS value to preserve relationship (positive or negative)
 corrs &lt;-<span class="st"> </span><span class="kw">arrange</span>(corrs, <span class="kw">desc</span>(<span class="kw">abs</span>(corr)))
 corrs</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## selecting column numbers
+col_nums &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">order</span>(<span class="kw">desc</span>(<span class="kw">abs</span>(foo))))
+## creating pairs plot
+<span class="kw">ggpairs</span>(<span class="kw">select</span>(mtcars, col_nums[<span class="dv">1</span>:<span class="dv">5</span>]), <span class="dt">title =</span> <span class="st">&quot;Pairs plot of most Significant Attributes towards MPG&quot;</span>)</code></pre></div>
+<p><img src="figs/pairs_corr-1.png" title="Figure 2" alt="Figure 2" style="display: block; margin: auto;" /></p>
 </div>
 
 
