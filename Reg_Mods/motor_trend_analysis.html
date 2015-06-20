@@ -82,7 +82,7 @@ code > span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Inf
 <li>Is an automatic or manual transmission better for MPG?</li>
 <li>Quantify the difference in MPG between manual and automatic transmissions</li>
 </ul>
-<p>To answer the above questions the analysis will first look into the basic statistical properties of the data using mean and standard deviation to gain a general idea of trends. Followering this a more detailed statitical analysis will include the fitting of linear models which can be used to predict future values within a level of confidence.</p>
+<p>To answer the above questions the analysis will first look into the basic statistical properties of the data using mean and standard deviation to gain a general idea of trends. Followering this a more detailed statitical analysis will include the fitting of linear models which can be used to predict future values within a level of confidence. Further, the analysis will look into multivariable linear regression to improve model fit. This will cover selection of regressors and quantifying the outcomes to reach a conclusion.</p>
 </div>
 <div id="exploring-the-data-set" class="section level3">
 <h3>Exploring the Data Set</h3>
@@ -100,14 +100,57 @@ code > span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Inf
 ##       trans     mean       sd
 ## 1 automatic 17.14737 3.833966
 ## 2    manual 24.39231 6.166504</code></pre>
-<p>The plot in appendix A shows the recorded MPG by transmission type. By observation it can be seen that for cars with automatic transmission the MPG is generally lower than that of manual cars. Also the range of MPG values for automatic cars is much smaller (more concentrated) than that of manual cars. The blue point for each transmission type represents the mean value of the data. The mean MPG for cars with automatic transmission is 17.147 MPG and the mean for manual cars is 24.392 MPG, which confirms the trend of higher MPG for manual cars. To qualtify the spread of the data we can look at the standard deviation from the mean. The standard deviation of automatic cars is 3.834 MPG which is lower than that for manual cars of 6.167 MPG, which indicates a range of values closer to the mean.</p>
+<p>The plot in Appendix A shows the recorded MPG by transmission type. By observation it can be seen that for cars with automatic transmission the MPG is generally lower than that of manual cars. Also the range of MPG values for automatic cars is much smaller (more concentrated) than that of manual cars. The blue point for each transmission type represents the mean value of the data. The mean MPG for cars with automatic transmission is 17.147 MPG and the mean for manual cars is 24.392 MPG, which confirms the trend of higher MPG for manual cars. To quantify the spread of the data we can look at the standard deviation from the mean. The standard deviation of automatic cars is 3.834 MPG which is lower than that for manual cars of 6.167 MPG, which indicates a range of values closer to the mean.</p>
+</div>
+<div id="hypothesis-testing" class="section level3">
+<h3>Hypothesis Testing</h3>
+<p>A two-sided T-test can quantify if there is a significant difference in the mean values of each group (automatic and manual) and something we should investigate more. Our default and alternative hypotheses are:</p>
+<p><span class="math display">\[ H_0: \mu(automatic) = \mu(manual) \]</span> <span class="math display">\[ H_a: \mu(automatic) - \mu(manual) \neg 0 \]</span></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># splitting the data into two subsets by transmission</span>
+autoMPG &lt;-<span class="st"> </span>dat %&gt;%<span class="st"> </span><span class="kw">filter</span>(trans ==<span class="st"> &quot;automatic&quot;</span>)
+manMPG &lt;-<span class="st"> </span>dat %&gt;%<span class="st"> </span><span class="kw">filter</span> (trans ==<span class="st"> &quot;manual&quot;</span>)
+t1 &lt;-<span class="st"> </span><span class="kw">t.test</span>(autoMPG$mpg, manMPG$mpg, <span class="dt">paired =</span> <span class="ot">FALSE</span>, <span class="dt">var.equal =</span> <span class="ot">FALSE</span>)
+t1</code></pre></div>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  autoMPG$mpg and manMPG$mpg
+## t = -3.7671, df = 18.332, p-value = 0.001374
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -11.280194  -3.209684
+## sample estimates:
+## mean of x mean of y 
+##  17.14737  24.39231</code></pre>
+<p>The results of a two-sided, non-paired t-test with unequal variances shows a p-value of 0.0013736. which is smaller than our significance rate of <code>0.05</code> (5%) which means we would reject the null hypothesis. Also the 95% confidence interval does not include zero which again indicates that there is a significant difference in means between the two groups and we should reject the null hypothesis.</p>
 </div>
 <div id="fitting-a-linear-regression-model" class="section level3">
 <h3>Fitting a Linear Regression Model</h3>
-<p>It makes no sense to create a linear regression of MPG and transmission type as the predictor is a discrete quantity. A linear regression line would draw between the two discrete values, an area which is undefined. If we treat the transmission type as two separate groups, the best linear model will be a constant, namely the mean of the group, <span class="math inline">\(\beta_0 = \mu\)</span>, and <span class="math inline">\(\beta_1\)</span> (the slope) will be undefined. Thus we must look for more significant predictors to MPG.</p>
+<p>Let’s see what a basic relationship might show between the outcomes of the groups.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit1 &lt;-<span class="st"> </span><span class="kw">lm</span>(mpg ~<span class="st"> </span>am, <span class="dt">data =</span> dat)
+<span class="kw">summary</span>(fit1)</code></pre></div>
+<pre><code>## 
+## Call:
+## lm(formula = mpg ~ am, data = dat)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -9.3923 -3.0923 -0.2974  3.2439  9.5077 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   17.147      1.125  15.247 1.13e-15 ***
+## am             7.245      1.764   4.106 0.000285 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 4.902 on 30 degrees of freedom
+## Multiple R-squared:  0.3598, Adjusted R-squared:  0.3385 
+## F-statistic: 16.86 on 1 and 30 DF,  p-value: 0.000285</code></pre>
+<p>The summary information from our regression model shows little more information about our data subset. The coefficients of the model <span class="math inline">\(Y_i = \beta_0 + \beta_1 \times X_1\)</span> are; <span class="math inline">\(\beta_0 =\)</span> <strong>17.147</strong> (intercept) which is the mean MPG of cars with automatic transmission and <span class="math inline">\(\beta_1 =\)</span> <strong>7.245</strong> (slope) that on average cars with manual transmission have a higher MPG by <strong>7.245</strong> mpg. The <span class="math inline">\(R^2\)</span> value shows us how much of the variation is explained by the regression model. Here, this basic model explains only <strong>35.98%</strong> of the variation in MPG values.</p>
 </div>
-<div id="attribute-correlations" class="section level3">
-<h3>Attribute Correlations</h3>
+<div id="multivariable-linear-regression" class="section level3">
+<h3>Multivariable Linear Regression</h3>
 <p>It is logical that more attributes will affect MPG than just transmission type. Now lets look for strong correlations between other attributes and MPG using the <code>corr()</code> function.</p>
 <pre><code>##    attr       corr
 ## 1   mpg  1.0000000
@@ -122,9 +165,36 @@ code > span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Inf
 ## 10 gear  0.4802848
 ## 11 qsec  0.4186840</code></pre>
 <p>The output above shows that many attributes have a stronger affect on MPG than transmission type (am), namely weight, cylinders, displacement, horse power. This would suggest that a multivariate regression model would better predict the possible MPG of a vehicle, with predictors of weight, cylinders, displacement and horse power. Lets look into this further. (See appendix B for the code for the above calculation and a pairs plot for illustration)</p>
+<p>However although some of the variables in our dataset correlate well with MPG, they might also correlate well with eachother. We ideally would like a regression model that is parsimonious, which means it has as few confounders as possible which are all orthogonal to one another. To help with this we can use <em>“Variance Inflation”</em> to show how a regressor (variable) will affect a model compared to when it is (ideally) orthogonal to other regressors. In <code>R</code> we use the <code>vif()</code> function in the <code>car</code> package.</p>
+<pre><code>##    Regressor       vif
+## 1       disp 21.620241
+## 2        cyl 15.373833
+## 3         wt 15.164887
+## 4         hp  9.832037
+## 5       carb  7.908747
+## 6       qsec  7.527958
+## 7       gear  5.357452
+## 8         vs  4.965873
+## 9         am  4.648487
+## 10      drat  3.374620</code></pre>
+<p>The above results show that the most influential regressor are displacement, cylinders, weight and horse power. Thus, lets try a linear model with these regressors plus our cofounder of interest, transmission. We can then use the <code>anova()</code> function to compare our two regression models.</p>
+<pre><code>## Analysis of Variance Table
+## 
+## Model 1: mpg ~ am
+## Model 2: mpg ~ am + disp + cyl + wt + hp
+##   Res.Df    RSS Df Sum of Sq      F    Pr(&gt;F)    
+## 1     30 720.90                                  
+## 2     26 163.12  4    557.78 22.226 4.507e-08 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>The results show a very small p-value which indicates the additional regressors in the second model are of significance in producing a btter regression model than out original. Recall that the original regresion model explained 35.98% of the variation. The new model explains <strong>85.51%</strong>. In comparison, a regression model using the remaining cofounders to model MPG has an <span class="math inline">\(R^2\)</span> value of 78.83%, so the new model better explains the variation in MPG than the cofounders we chose to omit.</p>
 </div>
-<div id="appendix-a---code-plot-of-mpg-vs-transmission" class="section level3">
-<h3>Appendix A - Code &amp; Plot of MPG vs Transmission</h3>
+<div id="conclusion" class="section level3">
+<h3>Conclusion</h3>
+<p>In conclusion we can now say that even given the additional cofounders of displacement, cylinders, weight and horse power that car with manual transmission have better MPG than those with automatic transmission. From the summary information in Appendix C we can see that manual cars on average are <strong>1.56</strong>mpg higher. However the associated p-value is relatively high, so maybe a more sophistocated model is required for a high significance level. The residual plots in Appendix D show that the residuals are fairly evenly distributed around zero meaning that the model is more <em>homoskedastic</em> than <em>heteroskedastic</em> (non constant variance), which indicates the model is a <em>‘good’</em> fit. The plots also highlight a few high influence points (Chrysler Imperial &amp; Toyota Corolla). Further analysis could look specifically at these records and using <em>influence measures</em> assess the affect these have had on the model and would a more accurate model be possible if we chose to omit them.</p>
+</div>
+<div id="appendix-a---code-plot-mpg-vs-transmission" class="section level3">
+<h3>Appendix A - Code: Plot: MPG vs Transmission</h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat &lt;-<span class="st"> </span>mtcars %&gt;%<span class="st"> </span><span class="kw">select</span>(mpg, am)
 
 ## adding a new column with am variable as a factor
@@ -141,8 +211,8 @@ stats
 g1 &lt;-<span class="st"> </span>g1 +<span class="st"> </span><span class="kw">geom_point</span>(<span class="dt">data =</span> stats, <span class="kw">aes</span>(<span class="dt">x =</span> trans, <span class="dt">y =</span> mean), <span class="dt">color =</span> <span class="st">&quot;blue&quot;</span>, <span class="dt">size =</span> <span class="dv">3</span>)</code></pre></div>
 <p><img src="figs/app_a-1.png" title="Figure 1" alt="Figure 1" style="display: block; margin: auto;" /></p>
 </div>
-<div id="appendix-b---code-calculating-correlations-between-attributes" class="section level3">
-<h3>Appendix B - Code Calculating Correlations between Attributes</h3>
+<div id="appendix-b---code-plot-correlation-between-attributes" class="section level3">
+<h3>Appendix B - Code: Plot: Correlation between Attributes</h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## calculating correlations of the data
 foo &lt;-<span class="st"> </span><span class="kw">cor</span>(mtcars, mtcars$mpg)
 corrs &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">attr =</span> <span class="kw">rownames</span>(foo), <span class="dt">corr =</span> foo[,<span class="dv">1</span>])
@@ -154,6 +224,42 @@ col_nums &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span 
 ## creating pairs plot
 <span class="kw">ggpairs</span>(<span class="kw">select</span>(mtcars, col_nums[<span class="dv">1</span>:<span class="dv">5</span>]), <span class="dt">title =</span> <span class="st">&quot;Pairs plot of most Significant Attributes towards MPG&quot;</span>)</code></pre></div>
 <p><img src="figs/pairs_corr-1.png" title="Figure 2" alt="Figure 2" style="display: block; margin: auto;" /></p>
+</div>
+<div id="appendix-c---code-vif-regressor-selection" class="section level3">
+<h3>Appendix C - Code: VIF &amp; Regressor Selection</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit &lt;-<span class="st"> </span><span class="kw">lm</span>(mpg ~<span class="st"> </span>., <span class="dt">data =</span> mtcars)
+bar &lt;-<span class="st"> </span><span class="kw">vif</span>(fit)
+vifs_long &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">Regressor =</span> <span class="kw">names</span>(bar), <span class="dt">vif =</span> bar)
+vifs_long &lt;-<span class="st"> </span><span class="kw">arrange</span>(vifs_long, <span class="kw">desc</span>(vif)) <span class="co"># arranging</span>
+vifs_wide &lt;-<span class="st"> </span><span class="kw">dcast</span>(vifs_long, .~<span class="st"> </span>Regressor, <span class="dt">value.var=</span><span class="st">&quot;vif&quot;</span>)[, <span class="dv">2</span>:(<span class="kw">dim</span>(vifs_long)[<span class="dv">1</span>]+<span class="dv">1</span>)] <span class="co"># for better presentation</span>
+vifs_long</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(fit2)</code></pre></div>
+<pre><code>## 
+## Call:
+## lm(formula = mpg ~ am + disp + cyl + wt + hp, data = mtcars)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.5952 -1.5864 -0.7157  1.2821  5.5725 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 38.20280    3.66910  10.412 9.08e-11 ***
+## am           1.55649    1.44054   1.080  0.28984    
+## disp         0.01226    0.01171   1.047  0.30472    
+## cyl         -1.10638    0.67636  -1.636  0.11393    
+## wt          -3.30262    1.13364  -2.913  0.00726 ** 
+## hp          -0.02796    0.01392  -2.008  0.05510 .  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.505 on 26 degrees of freedom
+## Multiple R-squared:  0.8551, Adjusted R-squared:  0.8273 
+## F-statistic:  30.7 on 5 and 26 DF,  p-value: 4.029e-10</code></pre>
+</div>
+<div id="appendix-d---plot-residual-plots" class="section level3">
+<h3>Appendix D - Plot: Residual Plots</h3>
+<p><img src="figs/app_d-1.png" title="" alt="" style="display: block; margin: auto;" /></p>
 </div>
 
 

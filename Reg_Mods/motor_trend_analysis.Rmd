@@ -11,6 +11,7 @@ output:
     highlight: tango
     self_contained: no
     theme: null
+widgets     : [mathjax]
 ---
 ```{r global_opts, include=FALSE}
 knitr::opts_chunk$set(fig.align='center', fig.path='figs/',
@@ -19,8 +20,9 @@ knitr::opts_chunk$set(fig.align='center', fig.path='figs/',
 library(datasets)
 library(dplyr)
 library(ggplot2)
-library(GGally)
-
+library(GGally) # required for ggpairs plot
+library(car)    # required for vif function
+library(reshape2) # help with data manipulation
 ```
 
 ### Executive Summary
@@ -30,7 +32,7 @@ This analysis explores the relationship between the transmission type of cars an
 * Is an automatic or manual transmission better for MPG?
 * Quantify the difference in MPG between manual and automatic transmissions
 
-To answer the above questions the analysis will first look into the basic statistical properties of the data using mean and standard deviation to gain a general idea of trends. Followering this a more detailed statitical analysis will include the fitting of linear models which can be used to predict future values within a level of confidence.
+To answer the above questions the analysis will first look into the basic statistical properties of the data using mean and standard deviation to gain a general idea of trends. Followering this a more detailed statitical analysis will include the fitting of linear models which can be used to predict future values within a level of confidence. Further, the analysis will look into multivariable linear regression to improve model fit. This will cover selection of regressors and quantifying the outcomes to reach a conclusion.
 
 ### Exploring the Data Set
 
@@ -59,13 +61,37 @@ g1 <- g1 + geom_point(data = stats, aes(x = trans, y = mean), color = "blue", si
 
 ```
 
-The plot in appendix A shows the recorded MPG by transmission type. By observation it can be seen that for cars with automatic transmission the MPG is generally lower than that of manual cars. Also the range of MPG values for automatic cars is much smaller (more concentrated) than that of manual cars. The blue point for each transmission type represents the mean value of the data. The mean MPG for cars with automatic transmission is `r round(stats$mean[1], 3)` MPG and the mean for manual cars is `r round(stats$mean[2], 3)` MPG, which confirms the trend of higher MPG for manual cars. To qualtify the spread of the data we can look at the standard deviation from the mean. The standard deviation of automatic cars is `r round(stats$sd[1], 3)` MPG which is lower than that for manual cars of `r round(stats$sd[2], 3)` MPG, which indicates a range of values closer to the mean.
+The plot in Appendix A shows the recorded MPG by transmission type. By observation it can be seen that for cars with automatic transmission the MPG is generally lower than that of manual cars. Also the range of MPG values for automatic cars is much smaller (more concentrated) than that of manual cars. The blue point for each transmission type represents the mean value of the data. The mean MPG for cars with automatic transmission is `r round(stats$mean[1], 3)` MPG and the mean for manual cars is `r round(stats$mean[2], 3)` MPG, which confirms the trend of higher MPG for manual cars. To quantify the spread of the data we can look at the standard deviation from the mean. The standard deviation of automatic cars is `r round(stats$sd[1], 3)` MPG which is lower than that for manual cars of `r round(stats$sd[2], 3)` MPG, which indicates a range of values closer to the mean.
+
+### Hypothesis Testing
+
+A two-sided T-test can quantify if there is a significant difference in the mean values of each group (automatic and manual) and something we should investigate more. Our default and alternative hypotheses are:
+
+$$ H_0: \mu(automatic) = \mu(manual) $$
+$$ H_a: \mu(automatic) - \mu(manual) \neg 0 $$
+
+```{r t-test, echo=TRUE}
+# splitting the data into two subsets by transmission
+autoMPG <- dat %>% filter(trans == "automatic")
+manMPG <- dat %>% filter (trans == "manual")
+t1 <- t.test(autoMPG$mpg, manMPG$mpg, paired = FALSE, var.equal = FALSE)
+t1
+```
+
+The results of a two-sided, non-paired t-test with unequal variances shows a p-value of `r t1$p.value`. which is smaller than our significance rate of `0.05` (5%) which means we would reject the null hypothesis. Also the 95% confidence interval does not include zero which again indicates that there is a significant difference in means between the two groups and we should reject the null hypothesis.
 
 ### Fitting a Linear Regression Model
 
-It makes no sense to create a linear regression of MPG and transmission type as the predictor is a discrete quantity. A linear regression line would draw between the two discrete values, an area which is undefined. If we treat the transmission type as two separate groups, the best linear model will be a constant, namely the mean of the group, $\beta_0 = \mu$, and $\beta_1$ (the slope) will be undefined. Thus we must look for more significant predictors to MPG.
+Let's see what a basic relationship might show between the outcomes of the groups.
 
-### Attribute Correlations
+```{r fit1, echo=TRUE}
+fit1 <- lm(mpg ~ am, data = dat)
+summary(fit1)
+```
+
+The summary information from our regression model shows little more information about our data subset. The coefficients of the model $Y_i = \beta_0 + \beta_1 \times X_1$ are; $\beta_0 =$ **`r round(coef(fit1)[1], 3)`** (intercept) which is the mean MPG of cars with automatic transmission and $\beta_1 =$ **`r round(coef(fit1)[2], 3)`** (slope) that on average cars with manual transmission have a higher MPG by **`r round(coef(fit1)[2], 3)`** mpg. The $R^2$ value shows us how much of the variation is explained by the regression model. Here, this basic model explains only **`r round(summary(fit1)$r.squared * 100, 2)`%** of the variation in MPG values.
+
+### Multivariable Linear Regression
 
 It is logical that more attributes will affect MPG than just transmission type. Now lets look for strong correlations between other attributes and MPG using the `corr()` function.
 
@@ -80,14 +106,39 @@ corrs
 
 The output above shows that many attributes have a stronger affect on MPG than transmission type (am), namely weight, cylinders, displacement, horse power. This would suggest that a multivariate regression model would better predict the possible MPG of a vehicle, with predictors of weight, cylinders, displacement and horse power. Lets look into this further. (See appendix B for the code for the above calculation and a pairs plot for illustration)
 
-### Appendix A - Code & Plot of MPG vs Transmission
+However although some of the variables in our dataset correlate well with MPG, they might also correlate well with eachother. We ideally would like a regression model that is parsimonious, which means it has as few confounders as possible which are all orthogonal to one another. To help with this we can use *"Variance Inflation"* to show how a regressor (variable) will affect a model compared to when it is (ideally) orthogonal to other regressors. In `R` we use the `vif()` function in the `car` package.
+
+```{r vif}
+fit <- lm(mpg ~ ., data = mtcars)
+bar <- vif(fit)
+vifs_long <- data.frame(Regressor = names(bar), vif = bar)
+vifs_long <- arrange(vifs_long, desc(vif)) # arranging
+vifs_wide <- dcast(vifs_long, .~ Regressor, value.var="vif")[, 2:(dim(vifs_long)[1]+1)] # for better presentation
+vifs_long
+```
+The above results show that the most influential regressor are displacement, cylinders, weight and horse power. Thus, lets try a linear model with these regressors plus our cofounder of interest, transmission. We can then use the `anova()` function to compare our two regression models.
+
+```{r fit2}
+fit2 <- lm(mpg ~ am + disp + cyl + wt + hp, data = mtcars)
+anti_fit <- lm(mpg ~ qsec + gear + carb + vs + drat, data = mtcars)
+ans <- anova(fit1, fit2)
+ans
+```
+
+The results show a very small p-value which indicates the additional regressors in the second model are of significance in producing a btter regression model than out original. Recall that the original regresion model explained `r round(summary(fit1)$r.squared * 100, 2)`% of the variation. The new model explains **`r round(summary(fit2)$r.squared * 100, 2)`%**. In comparison, a regression model using the remaining cofounders to model MPG has an $R^2$ value of `r round(summary(anti_fit)$r.squared * 100, 2)`%, so the new model better explains the variation in MPG than the cofounders we chose to omit.
+
+### Conclusion
+
+In conclusion we can now say that even given the additional cofounders of displacement, cylinders, weight and horse power that car with manual transmission have better MPG than those with automatic transmission. From the summary information in Appendix C we can see that manual cars on average are **`r round(coef(fit2)[2], 2)`**mpg higher. However the associated p-value is relatively high, so maybe a more sophistocated model is required for a high significance level. The residual plots in Appendix D show that the residuals are fairly evenly distributed around zero meaning that the model is more *homoskedastic* than *heteroskedastic* (non constant variance), which indicates the model is a *'good'* fit. The plots also highlight a few high influence points (Chrysler Imperial & Toyota Corolla). Further analysis could look specifically at these records and using *influence measures* assess the affect these have had on the model and would a more accurate model be possible if we chose to omit them.
+
+### Appendix A - Code: Plot: MPG vs Transmission
 ```{r data_exp, echo=TRUE, eval=FALSE}
 ```
 ```{r app_a, fig.cap="Figure 1"}
 g1
 ```
 
-### Appendix B - Code Calculating Correlations between Attributes
+### Appendix B - Code: Plot: Correlation between Attributes
 ```{r corrs, echo=TRUE, eval=FALSE}
 ```
 ```{r pairs_corr, echo=TRUE, fig.cap="Figure 2"}
@@ -95,4 +146,19 @@ g1
 col_nums <- as.numeric(order(desc(abs(foo))))
 ## creating pairs plot
 ggpairs(select(mtcars, col_nums[1:5]), title = "Pairs plot of most Significant Attributes towards MPG")
+```
+
+### Appendix C - Code: VIF & Regressor Selection
+```{r vif, echo=TRUE, eval=FALSE}
+```
+```{r app_c, echo=TRUE}
+summary(fit2)
+```
+
+
+### Appendix D - Plot: Residual Plots
+```{r app_d}
+par(mfrow = c(2,2))
+plot(fit2)
+par(mfrow = c(1,1))
 ```

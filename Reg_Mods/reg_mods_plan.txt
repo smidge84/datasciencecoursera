@@ -47,5 +47,19 @@ cars, they are interested in exploring the relationship between a set of variabl
 # Misc
 Good example report
 http://rstudio-pubs-static.s3.amazonaws.com/20260_6b6ddcddd3ba4432804990538f00f179.html
+http://rstudio-pubs-static.s3.amazonaws.com/20516_29b941670a4b42688292b4bb892a660f.html
+http://rstudio-pubs-static.s3.amazonaws.com/27910_fedcfefad8184f29a2ae0b9d09fe4273.html <- uses variation inflation (Vif) to help with selection of cofounders
+
+
 Search for examples:
 Regression Models Course Project
+
+## NEXT
+Hypothesis testing:
+T-test of two (unpaired) groups can show that mpg & am are significantly different from each other.
+because the t confidence interval does not include zero, we reject the null hypothesis that they are related
+
+Multivariate Linear Regression Models.
+Function to assess and choose best combination of all possible variables?
+Use a plot of residuals to illustrate this is a good choice. and R squared result (quantifies proportion of variation explained by the model)???
+
