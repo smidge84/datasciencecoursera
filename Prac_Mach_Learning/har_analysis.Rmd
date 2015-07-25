@@ -1,0 +1,99 @@
+---
+title: "Human Activity Recognition Analysis"
+author: "Rich Robinson"
+date: "19 July 2015"
+output: html_document
+---
+
+## Introduction
+
+The aim of this project was to take data gathered from 6 subjects performing bicep curls with a dumbbell correctly and incorrectly (in four different manners), giving a total of five possible outcomes, and build a machine learning model that could predict from the sensor data if the subject was performing the exercise correctly or incorrectly (in a certain way). This is extending the world of computer recognition of human actions to now a qualitive feedback about how well the action was performed.
+
+## Exploting the Data
+
+The training data provided contained both raw and summary data gathered from the sensors as well as the known outcome of how well the activity was being performed.
+The test data for use later in predicting the outcome of 20 activities is exactly the same except the outcome variable has been removed.
+
+Some exploratory analysis of the data shows that from the original 160 variables, a large proportion of them have ahigh number of missing values. In order to simplify things for now these variables were removed from the data set, leaving a total of 60 variables. In addition to these the first 7 columns of username, window information and timestamps are not so useful to the anaylsis and can also be removed, leaving a total of 53 variables.
+
+```{r exp_data, echo = FALSE, warning=FALSE, message=FALSE}
+  ## reading in the data sets
+  pml_train <- read.csv("pml-training.csv", header = TRUE, na.strings = c("NA", "", "#DIV/0!"))
+  pml_test <- read.csv("pml-testing.csv", header = TRUE, na.strings = c("NA", "", "#DIV/0!"))
+
+
+  ## Predictor Selection ##
+  ## ignore variables/columns with more than 60% NA values
+  low_nas <- which(colSums(is.na(pml_train) / nrow(pml_train)) < 0.6)
+  ## selecting only low NA columns from the training data
+  sml_train <- pml_train[, low_nas]
+
+  ## splitting our condenced training data into a training and validation sets
+  library(caret)
+  set.seed(7984)
+  inTrain <- createDataPartition(y = sml_train$classe, p = 0.6, list = FALSE)
+  my_train <- sml_train[inTrain,]
+  my_valid <- sml_train[-inTrain,]
+  ## If any variables has few missing values, we could use pre-processing
+  ## at this stage to normalise the variable and impute the missing values
+  ## possibly using k nearest neighbours method
+
+  ## Also the first 7 columns of the data are not significant to a prediction model
+  ## The timestamps and windows basically also define which class of exercise was   executed
+  ## Thus we should only use the raw telemetary data gatered by the sensors.
+  my_train <- my_train[,-c(1:7)]
+  my_valid <- my_valid[,-c(1:7)]
+```
+
+These 53 variables are:
+```{r}
+  names(my_train)
+```
+
+As you can see, these are mostly raw telemtary data gathered by the sensors and not summary variables derived from the raw data.
+
+The provided trainging data was split into a training set (60%) and validation set (40%) to provide a basic level of cross validation to assess the out-of-sample error rate before executing the model on the provided test data.
+
+## Modelling the Data
+### Random Forests
+
+This problem is clearly a classification problem with 5 possible outcomes. This naturally suggests a learning model bases on classification trees would be most suitable. Earlier attempts using **Recursive Partitioning and Regression Trees** (`rpart`) didn't prove very accurate, so **Random Forests** was a choice for improved accuracy but at a dramatic cost to computation time. The `doParallel` package was also used to help improve the execution but taking advantage of multiple processor cores.
+
+```{r rf, echo = TRUE, cache = TRUE, warning=FALSE, message=FALSE}
+  # read in the saved model from earlier
+  rf_mod_smp <- readRDS("rf_mod_smp.rds")
+  
+  ## firstly we need to manipulate the pml_test data so that it is in the same format as the training data
+  cols <- names(my_train)
+  my_test <- pml_test[, names(pml_test) %in% cols]
+
+  test_ans2 <- predict(rf_mod_smp, newdata = my_test)
+  
+```
+
+The machine I use to complete these assignments on in a Laptop which is about 4 years old. It's a 32bit machine with 3 Gb of RAM. This became a limitation when calculating my model not only in long execution times but also I kept getting strange errors.
+
+* "Unable to allocate memory for vector of size 1 GB"
+* "There were missing values in resampled performance measures."
+
+I was unable to resolve these in time so I resorted to building my model on a sub-sample of 1000 records from my training set. This gave me a model with an **in-sample error rate** of **9.1%**.
+
+```{r rf_pred, echo = TRUE, warning=FALSE, message=FALSE}
+  pred_rf <- predict(rf_mod_smp, newdata = my_valid)
+  
+  con_mat2 <- confusionMatrix(pred_rf, my_valid$classe)
+  con_mat2$table
+```
+The confusion matrix above shows how well the model performed on the validation data set. considering that I was only able to train my model on 1000 records, the model achieved and accuracy of **`r round(con_mat2$overall["Accuracy"]*100, 1)`%** which is not too bad. Therefore the **out-of-sample error rate** of **`r round((1-con_mat2$overall["Accuracy"])*100, 1)`%**.
+
+## Predicting New Values
+
+The assignment asked us to predict the outcome of 20 new records which were not part of our training data. My predictions for these can be seen below.
+
+```{r ans, echo = FALSE}
+test_ans2  
+```
+
+## Possible Improvements
+
+This analysis is by no means complete. To improve this given more time, I would like to have access to a more powerful computer on which to generate my models. Also I would like to implement a more analytical approach to predictor selection, looking at correlations between predictors and maybe use some pre-processing methods such as principle components anaylsis to combine certain variables and therefore reduce the number of predictors.
