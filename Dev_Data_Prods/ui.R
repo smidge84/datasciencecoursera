@@ -49,7 +49,8 @@ shinyUI(
                  verbatimTextOutput("oConMat")
         ),
         tabPanel("Tree", value = "tab2",
-                 p("Regression Tree of Random Forest model to appear here")
+                 h3("Random Forest Classification Tree"),
+                 plotOutput("oTree")
         ),
         tabPanel("Scatter Plot", value = "tab3",
                  p("Scatter Plot to appear here")

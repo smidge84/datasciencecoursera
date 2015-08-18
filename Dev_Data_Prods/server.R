@@ -1,9 +1,16 @@
+library(rattle)
 library(caret)
 library(datasets)
 data(iris)
 
 library(shiny)
 cat("... Server Init ...\n", file = stderr())
+
+modelTree <- function(mod, runN){
+  cat("... Updating Model Tree for model run ", runN," ...\n", file = stderr())
+  
+  fancyRpartPlot(mod$finalModel)
+}
 
 shinyServer(
   function(input, output){
@@ -28,5 +35,6 @@ shinyServer(
 
     output$oSelected <- renderText({runModel()$mod$coefnames})
     output$oConMat <- renderPrint({runModel()$conMat})
+    output$oTree <- renderPlot({modelTree(runModel()$mod, x)})
   }
 )
