@@ -19,7 +19,7 @@ shinyServer(
       training <- iris[inTrain, cols]
       testing <- iris[-inTrain, cols]
       
-      cat("... Model Run: ", x, " ...\n", file = stderr())
+      cat("... Model Run ", x, ": ", cols, " ...\n", file = stderr())
       
       modFit <- train(Species ~ ., method = "rpart", data = training)
       cm <- confusionMatrix(predict(modFit, testing), testing$Species)
