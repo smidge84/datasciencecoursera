@@ -26,9 +26,9 @@ shinyUI(
                        p("Sidebar Options for regression tree here")
       ),
       conditionalPanel(condition = "input.tabs == 'tab3'",
-                       p("Options here for scatter plot"),
-                       p("Drop down list for x-variable"),
-                       p("Drop down list for y-variable")
+                       p("Options here for scatter plot\nPushed from Server side"),
+                       selectInput("xVar1", "Select X Variable", choices = NULL),
+                       selectInput("yVar1", "Select Y Variable", choices = NULL)
         
       ),
       conditionalPanel(condition = "input.tabs == 'tab4'",
@@ -53,10 +53,13 @@ shinyUI(
                  plotOutput("oTree")
         ),
         tabPanel("Scatter Plot", value = "tab3",
-                 p("Scatter Plot to appear here")
+                 h3("Predicting New Values"),
+                 plotOutput("oPlot1")
+                 
         ),
         tabPanel("Correct Outcomes", value = "tab4",
-                 p("Plot of corrct outcomes here")
+                 p("Plot of corrct outcomes here"),
+                 tableOutput("oDT")
         ),
         id = "tabs"
       )
