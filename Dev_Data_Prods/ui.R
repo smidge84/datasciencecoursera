@@ -26,14 +26,15 @@ shinyUI(
                        p("Sidebar Options for regression tree here")
       ),
       conditionalPanel(condition = "input.tabs == 'tab3'",
-                       p("Options here for scatter plot\nPushed from Server side"),
+                       p("Select variables for axes."),
                        selectInput("xVar1", "Select X Variable", choices = NULL),
                        selectInput("yVar1", "Select Y Variable", choices = NULL)
         
       ),
       conditionalPanel(condition = "input.tabs == 'tab4'",
-                       p("Options for another scatter plot here"),
-                       p("Probably as tab3 ut maybe some explanitory text")
+                       p("Please select variables for axes."),
+                       selectInput("xVar2", "Select X Variable", choices = names(iris)[-5], selected = "Sepal.Length"),
+                       selectInput("yVar2", "Select Y Variable", choices = names(iris)[-5], selected = "Petal.Length")
         
       )
       
@@ -54,12 +55,16 @@ shinyUI(
         ),
         tabPanel("Scatter Plot", value = "tab3",
                  h3("Predicting New Values"),
-                 plotOutput("oPlot1")
-                 
+                 plotOutput("oPlot1"),
+                 hr(),
+                 h3("Table of Predicted Species"),
+                 tableOutput("oDT")
         ),
         tabPanel("Correct Outcomes", value = "tab4",
-                 p("Plot of corrct outcomes here"),
-                 tableOutput("oDT")
+                 plotOutput("oPlot2"),
+                 p("The plot above shows the whole data set, coloured by species, to help visually understand the data set."),
+                 p("By selecting various combinations of variables, plot with the most distinct clustering will yield better models.")
+                 
         ),
         id = "tabs"
       )

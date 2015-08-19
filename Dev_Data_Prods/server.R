@@ -13,13 +13,18 @@ modelTree <- function(mod, runN){
   fancyRpartPlot(mod$finalModel)
 }
 
-# makePlot1 <- function(predDat, xVar, yVar){
-#   if(is.null(xVar)) return()
-#   cat("... Making Plot ...\n.xVar =", xVar, "yVar =", yVar, "...\n", file = stderr())
-# 
-#   g <- ggplot(data = predDat, aes(x = xVar, y = yVar, colour = predRight)) + geom_point()
-#   print(g)
-# }
+makePlot1 <- function(predDat, xVar, yVar){
+  if(is.null(xVar)) return()
+  cat("... Making Plot ...\n.xVar =", xVar, "yVar =", yVar, "...\n", file = stderr())
+
+  g <- ggplot(data = predDat, aes_string(x = xVar, y = yVar, colour = "predRight")) + geom_point()
+  print(g)
+}
+
+makePlot2 <- function(dataF, xVar, yVar){
+  g <- ggplot(data = dataF, aes_string(x = xVar, y = yVar, colour = "Species")) + geom_point()
+  print(g)
+}
 
 shinyServer(
   function(input, output, session){
@@ -52,10 +57,8 @@ shinyServer(
     output$oSelected <- renderText({runModel()$mod$coefnames})
     output$oConMat <- renderPrint({runModel()$conMat})
     output$oTree <- renderPlot({modelTree(runModel()$mod, x)})
-    # output$oPlot1 <- renderPlot({makePlot1(runModel()$testDat, input$xVar1, input$yVar1)})
+    output$oPlot1 <- renderPlot({makePlot1(runModel()$testDat, input$xVar1, input$yVar1)})
     output$oDT <- renderTable({runModel()$testDat})
-    output$oPlot1 <- renderPlot({
-      qplot(input$xVar1, input$yVar1, colour=predRight, data = runModel()$testDat)
-    })
+    output$oPlot2 <- renderPlot({makePlot2(iris, input$xVar2, input$yVar2)})
   }
 )
