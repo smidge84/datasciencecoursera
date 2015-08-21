@@ -1,0 +1,40 @@
+---
+title       : Regression Tree Illustrator
+subtitle    : A tool to visually compare the affectiveness of different regression tree algorithms
+author      : Rich Robinson
+job         : Coursera Developing Data Products Course
+framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
+highlighter : highlight.js  # {highlight.js, prettify, highlight}
+hitheme     : tomorrow      # 
+widgets     : []            # {mathjax, quiz, bootstrap}
+mode        : selfcontained # {standalone, draft}
+knit        : slidify::knit2slides
+github:
+  user: smidge84
+  repo: dataProdsPres
+---
+
+## Read-And-Delete
+
+> 1. Edit YAML front matter
+> 2. Write using R Markdown
+> 3. Use an empty line followed by three dashes to separate slides!
+
+--- .class #id 
+
+## Slide 2
+
+Hello Slidify!
+
+---
+
+## Motion Chart
+
+```{r echo=FALSE, results='asis', message=FALSE}
+require(googleVis)
+M1 <- gvisMotionChart(Fruits, idvar = "Fruit", timevar = "Year")
+print(M1, tag = 'chart')
+```
+
+
+
