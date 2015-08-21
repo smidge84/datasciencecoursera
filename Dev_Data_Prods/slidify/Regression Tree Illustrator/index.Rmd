@@ -11,7 +11,7 @@ mode        : selfcontained # {standalone, draft}
 knit        : slidify::knit2slides
 github:
   user: smidge84
-  repo: dataProdsPres
+  repo: datasciencecoursera
 ---
 
 ## Read-And-Delete
