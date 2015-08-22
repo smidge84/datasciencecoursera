@@ -1,16 +1,17 @@
 library(ggplot2)
-library(rattle)
+#library(rattle)
 library(caret)
 library(datasets)
 data(iris)
-
+require(e1071)
 library(shiny)
 cat("... Server Init ...\n", file = stderr())
 
 modelTree <- function(mod, runN){
   cat("... Updating Model Tree for model run", runN,"...\n", file = stderr())
   
-  fancyRpartPlot(mod$finalModel)
+  #fancyRpartPlot(mod$finalModel)
+  plot(mod$finalModel)
 }
 
 makePlot1 <- function(predDat, xVar, yVar){
@@ -33,7 +34,7 @@ shinyServer(
     
     runModel <- reactive({
       x <<- x + 1
-      if(input$setSeed == TRUE) set.seed(7984)
+      if(input$setSeed == TRUE) set.seed(input$seedVal)
       
       cols <- c(input$preds, "Species")
       inTrain <- createDataPartition(y = iris$Species, p = 0.7, list = FALSE)
@@ -56,7 +57,7 @@ shinyServer(
 
     output$oSelected <- renderText({runModel()$mod$coefnames})
     output$oConMat <- renderPrint({runModel()$conMat})
-    output$oTree <- renderPlot({modelTree(runModel()$mod, x)})
+    #output$oTree <- renderPlot({modelTree(runModel()$mod, x)})
     output$oPlot1 <- renderPlot({makePlot1(runModel()$testDat, input$xVar1, input$yVar1)})
     output$oDT <- renderTable({runModel()$testDat})
     output$oPlot2 <- renderPlot({makePlot2(iris, input$xVar2, input$yVar2)})
