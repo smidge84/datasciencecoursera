@@ -20,12 +20,33 @@ github:
 * To produce an interactive and visual learning tool to help with understanding of prediction models.
 * The prediction model choosen was **classification trees** (`rpart`) because they are quick to compute and simple to implement at this early stage.
 
---- .class #id3 
+--- &twocol w1:40% w2:60% 
 
 ## Implementation
 
 * __Shiny__ was choosen as the implementation language as it provides a rapid way to get a prototype app running, where the package automatically takes care of the asthetics and has a large library of pre-defined widgets, allowing myself more time to focus on functional code.
 * The __iris__ data set from the `datasets()` package was choosen because it is small in size but very good for illustration of various algorithms as the data splits very well into groups but has a slight crossover section which can allow for errors in prediction.
+
+#### Some R Code
+
+
+```r
+require(datasets)
+data(iris)
+names(iris); dim(iris)
+```
+
+```
+## [1] "Sepal.Length" "Sepal.Width"  "Petal.Length" "Petal.Width" 
+## [5] "Species"
+```
+
+```
+## [1] 150   5
+```
+
+
+
 
 --- .class #id4
 
