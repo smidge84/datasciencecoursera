@@ -102,10 +102,12 @@ These outputs include:</p>
 
 <ul>
 <li>Text summary statistics &amp; confusion matrix</li>
-<li>Graphical display of the regression tree model used for prediction</li>
+<li>Graphical display of the regression tree model used for prediction (see note)</li>
 <li>A 2 variable plot of the testing data, highlighting which records were predicted correctly and those which were not.</li>
 <li>A 2 variable plot of the whole data set. This is useful for visual data exploration and an aid for predictor selection.</li>
 </ul>
+
+<p>Note: The plot of the classification tree had to be removed because shinyapps.io does not support the use of the <code>rattle</code> package. It produced an error with the <code>RGtk2</code> package during app deployment.</p>
 
   </article>
   <!-- Presenter Notes -->

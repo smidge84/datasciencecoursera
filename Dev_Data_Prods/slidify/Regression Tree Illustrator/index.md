@@ -55,9 +55,11 @@ names(iris); dim(iris)
 The app provides the user with a simple set of options on the left, which predictors to include in the model, and shows various results and outputs in tabs on the right.
 These outputs include:
 * Text summary statistics & confusion matrix
-* Graphical display of the regression tree model used for prediction
+* Graphical display of the regression tree model used for prediction (see note)
 * A 2 variable plot of the testing data, highlighting which records were predicted correctly and those which were not.
 * A 2 variable plot of the whole data set. This is useful for visual data exploration and an aid for predictor selection.
+
+Note: The plot of the classification tree had to be removed because shinyapps.io does not support the use of the `rattle` package. It produced an error with the `RGtk2` package during app deployment.
 
 --- .class #id5
 
